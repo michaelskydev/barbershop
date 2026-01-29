@@ -1,0 +1,327 @@
+.container {
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--background);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #333;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.tab {
+    padding: 0.5rem 1rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.activeTab {
+    padding: 0.5rem 1rem;
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+    font-weight: bold;
+}
+
+.datePicker {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid #444;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.calendar {
+    display: flex;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid #333;
+    overflow: hidden;
+}
+
+.timeline {
+    width: 80px;
+    flex-shrink: 0;
+    border-right: 1px solid #333;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.timeHeader {
+    height: 50px;
+    border-bottom: 1px solid #333;
+}
+
+.timeLabel {
+    height: 100px;
+    /* Must match grid height calculation */
+    display: flex;
+    justify-content: center;
+    padding-top: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    border-bottom: 1px solid #333;
+}
+
+.grid {
+    flex: 1;
+    display: flex;
+    overflow-x: auto;
+}
+
+.col {
+    flex: 1;
+    min-width: 200px;
+    border-right: 1px solid #333;
+    position: relative;
+}
+
+.colHeader {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #333;
+    border-top: 4px solid transparent;
+    /* Colored by JS */
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.colContent {
+    position: relative;
+    /* Total height: 9 hours * 100px = 900px */
+    height: 900px;
+}
+
+.hourCell {
+    height: 100px;
+    border-bottom: 1px solid #2a2a2a;
+    /* Subtle grid line */
+}
+
+.appointment {
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    background: var(--primary);
+    color: #1a1a1a;
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.appointment.pending {
+    background: #ffb74d;
+    /* Orange */
+}
+
+.appointment.approved {
+    background: #81c784;
+    /* Green */
+}
+
+.appointment.rejected {
+    background: #e57373;
+    /* Red */
+    opacity: 0.6;
+}
+
+.appTime {
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.appName {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.appService {
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.actions {
+    margin-top: auto;
+    display: flex;
+    gap: 5px;
+    justify-content: flex-end;
+}
+
+.actions button {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #1a1a1a;
+}
+
+.actions button:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.manageContainer {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.addBarber {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+}
+
+.rowForm {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.input {
+    flex: 1;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+    color: var(--text);
+    border-radius: var(--radius);
+}
+
+.colorParams {
+    height: 45px;
+    width: 60px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+}
+
+.button {
+    background: var(--primary);
+    color: #1a1a1a;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    font-weight: bold;
+}
+
+.barberList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.barberCard {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.barberName {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.colorDot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.smallBtn {
+    padding: 0.5rem 1rem;
+    background: #333;
+    color: var(--text);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 600px;
+}
+
+.scheduleGrid {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dayRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.dayName {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 150px;
+}
+
+.timeInputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.timeInputs input {
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: var(--text);
+    padding: 0.25rem;
+    border-radius: 4px;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}

@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Barber {
+  id           Int           @id @default(autoincrement())
+  name         String
+  color        String
+  appointments Appointment[]
+  schedules    Schedule[]
+}
+
+model Service {
+  id           Int           @id @default(autoincrement())
+  name         String
+  duration     Int
+  price        Float
+  appointments Appointment[]
+}
+
+model Appointment {
+  id            Int      @id @default(autoincrement())
+  customerName  String
+  customerEmail String
+  startDate     DateTime
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  
+  barberId      Int
+  barber        Barber   @relation(fields: [barberId], references: [id])
+  
+  serviceId     Int
+  service       Service  @relation(fields: [serviceId], references: [id])
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+}
+
+model Schedule {
+  id        Int     @id @default(autoincrement())
+  dayOfWeek Int     // 0-6
+  startTime String  // "09:00"
+  endTime   String  // "17:00"
+  active    Boolean @default(true)
+  
+  barberId  Int
+  barber    Barber  @relation(fields: [barberId], references: [id])
+
+  @@unique([barberId, dayOfWeek])
+}

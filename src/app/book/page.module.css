@@ -1,0 +1,215 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: var(--background);
+}
+
+.wizard {
+    width: 100%;
+    max-width: 600px;
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: var(--text-muted);
+}
+
+.progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.step {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.step.active {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.line {
+    flex: 1;
+    height: 2px;
+    background-color: #333;
+    margin: 0 1rem;
+}
+
+.content {
+    flex: 1;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.card:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.card.selected {
+    border-color: var(--primary);
+    background-color: rgba(194, 155, 94, 0.1);
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.listItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.listItem:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.listItem.selected {
+    border-color: var(--primary);
+    background-color: rgba(194, 155, 94, 0.1);
+}
+
+.serviceInfo h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.serviceInfo span {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    border: 1px solid #444;
+    background-color: #1a1a1a;
+    color: var(--text);
+    font-family: inherit;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.footer {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.button {
+    background-color: var(--primary);
+    color: #1a1a1a;
+    padding: 0.75rem 2rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.buttonSecondary {
+    color: var(--text);
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+}
+
+.summary {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+}
+
+.summary p {
+    margin-bottom: 0.5rem;
+}
+
+.successContainer {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.successCard {
+    text-align: center;
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: var(--radius);
+    max-width: 500px;
+}
+
+.successCard h1 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.successCard p {
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
