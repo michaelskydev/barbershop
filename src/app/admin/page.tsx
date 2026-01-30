@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 
-type Barber = { id: number; name: string; color: string };
+type Barber = { id: number; name: string; color: string; schedules: any[] };
 type Appointment = {
     id: number;
     startDate: string;
@@ -22,8 +22,8 @@ export default function AdminPage() {
     const fetchData = async () => {
         setLoading(true);
         const [barbersRes, appointmentsRes] = await Promise.all([
-            fetch('/api/barbers'),
-            fetch(`/api/appointments?date=${date}`)
+            fetch('/api/barbers', { cache: 'no-store' }),
+            fetch(`/api/appointments?date=${date}`, { cache: 'no-store' })
         ]);
         const barbersData = await barbersRes.json();
         const appointmentsData = await appointmentsRes.json();
@@ -51,7 +51,7 @@ export default function AdminPage() {
     // Let's do simple list per barber for MVP or a rigid grid
     // Rigid grid is better for "Calendar View"
 
-    const [tab, setTab] = useState<'calendar' | 'barbers'>('calendar');
+    const [tab, setTab] = useState<'calendar' | 'barbers' | 'services'>('calendar');
     const [newBarberName, setNewBarberName] = useState('');
     const [newBarberColor, setNewBarberColor] = useState('#000000');
 
@@ -97,13 +97,88 @@ export default function AdminPage() {
         setEditingSchedule(null);
     };
 
+    const deleteBarber = async (id: number) => {
+        if (!confirm('Are you sure? This will delete all appointments for this barber.')) return;
+        await fetch(`/api/barbers/${id}`, { method: 'DELETE' });
+        fetchData();
+    };
+
+    // Manual Booking State
+    const [bookingModalOpen, setBookingModalOpen] = useState(false);
+    const [bookingSlot, setBookingSlot] = useState<{ barberId: number, date: string, time: string } | null>(null);
+    const [bookingServiceId, setBookingServiceId] = useState<number | null>(null);
+    const [bookingCustomerName, setBookingCustomerName] = useState('');
+    const [bookingCustomerEmail, setBookingCustomerEmail] = useState('');
+    const [services, setServices] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetch('/api/services').then(res => res.json()).then(setServices);
+    }, []);
+
+    const handleSlotClick = (barberId: number, hour: number) => {
+        const time = `${hour < 10 ? '0' : ''}${hour}:00`;
+        setBookingSlot({ barberId, date, time });
+        setBookingModalOpen(true);
+    };
+
+    const handleManualBook = async () => {
+        if (!bookingSlot || !bookingServiceId) return;
+        const startDateTime = new Date(`${bookingSlot.date}T${bookingSlot.time}`);
+
+        await fetch('/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                barberId: bookingSlot.barberId,
+                serviceId: bookingServiceId,
+                startDate: startDateTime.toISOString(),
+                customerName: bookingCustomerName || 'Walk-in',
+                customerEmail: bookingCustomerEmail || 'admin@local'
+            })
+        });
+        setBookingModalOpen(false);
+        setBookingCustomerName('');
+        fetchData();
+    };
+
     const hours = [9, 10, 11, 12, 13, 14, 15, 16, 17]; // 9am to 6pm
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const handleLogout = async () => {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/admin/login';
+    };
+
+    const [newService, setNewService] = useState({ name: '', duration: 30, price: 0 });
+
+    const addService = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await fetch('/api/services', {
+            method: 'POST',
+            body: JSON.stringify(newService),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        setNewService({ name: '', duration: 30, price: 0 });
+        const res = await fetch('/api/services'); // re-fetch services
+        const data = await res.json();
+        setServices(data);
+    };
+
+    const deleteService = async (id: number) => {
+        if (!confirm('Delete this service?')) return;
+        await fetch(`/api/services/${id}`, { method: 'DELETE' });
+        const res = await fetch('/api/services');
+        const data = await res.json();
+        setServices(data);
+    };
 
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1>Admin Dashboard</h1>
+                <div className={styles.headerTop}>
+                    <h1>Admin Dashboard</h1>
+                    <button onClick={handleLogout} className={styles.logoutBtn}>Sign Out</button>
+                </div>
                 <div className={styles.controls}>
                     <button
                         className={tab === 'calendar' ? styles.activeTab : styles.tab}
@@ -117,6 +192,12 @@ export default function AdminPage() {
                     >
                         Manage Barbers
                     </button>
+                    <button
+                        className={tab === 'services' ? styles.activeTab : styles.tab}
+                        onClick={() => setTab('services')}
+                    >
+                        Services
+                    </button>
                     {tab === 'calendar' && (
                         <input
                             type="date"
@@ -127,6 +208,50 @@ export default function AdminPage() {
                     )}
                 </div>
             </header>
+
+            {bookingModalOpen && bookingSlot && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modal}>
+                        <h2>Manual Booking</h2>
+                        <p>Time: {bookingSlot.time} on {bookingSlot.date}</p>
+
+                        <div className={styles.formGroup}>
+                            <label>Service</label>
+                            <select
+                                className={styles.input}
+                                value={bookingServiceId || ''}
+                                onChange={e => setBookingServiceId(parseInt(e.target.value))}
+                            >
+                                <option value="">Select Service</option>
+                                {services.map(s => (
+                                    <option key={s.id} value={s.id}>{s.name} (${s.price})</option>
+                                ))}
+                            </select>
+
+                            <label>Customer Name</label>
+                            <input
+                                className={styles.input}
+                                placeholder="Customer Name"
+                                value={bookingCustomerName}
+                                onChange={e => setBookingCustomerName(e.target.value)}
+                            />
+
+                            <label>Email (Optional)</label>
+                            <input
+                                className={styles.input}
+                                placeholder="Email"
+                                value={bookingCustomerEmail}
+                                onChange={e => setBookingCustomerEmail(e.target.value)}
+                            />
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button onClick={handleManualBook} className={styles.button}>Book</button>
+                            <button onClick={() => setBookingModalOpen(false)} className={styles.smallBtn}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {editingSchedule && (
                 <div className={styles.modalOverlay}>
@@ -189,10 +314,37 @@ export default function AdminPage() {
                                             {barber.name}
                                         </div>
                                         <div className={styles.colContent}>
-                                            {/* Background lines for hours */
-                                                hours.map(h => (
-                                                    <div key={h} className={styles.hourCell}></div>
-                                                ))
+                                            {/* Background lines for hours - CLICKABLE */
+                                                hours.map(h => {
+                                                    // Calculate local day of week
+                                                    const [y, m, d] = date.split('-').map(Number);
+                                                    const localDate = new Date(y, m - 1, d);
+                                                    const dayOfWeek = localDate.getDay();
+
+                                                    const schedule = barber.schedules?.find(s => s.dayOfWeek === dayOfWeek);
+                                                    let isOpen = false;
+                                                    if (schedule && schedule.active) {
+                                                        const startH = parseInt(schedule.startTime.split(':')[0]);
+                                                        const endH = parseInt(schedule.endTime.split(':')[0]);
+                                                        if (h >= startH && h < endH) {
+                                                            isOpen = true;
+                                                        }
+                                                    }
+
+                                                    return (
+                                                        <div
+                                                            key={h}
+                                                            className={styles.hourCell}
+                                                            onClick={() => isOpen && handleSlotClick(barber.id, h)}
+                                                            style={{
+                                                                cursor: isOpen ? 'pointer' : 'not-allowed',
+                                                                backgroundColor: isOpen ? 'transparent' : '#f5f5f5',
+                                                                opacity: isOpen ? 1 : 0.5
+                                                            }}
+                                                            title={isOpen ? `Click to book` : 'Closed'}
+                                                        ></div>
+                                                    );
+                                                })
                                             }
 
                                             {/* Render Appointments */
@@ -211,6 +363,7 @@ export default function AdminPage() {
                                                                 key={app.id}
                                                                 className={`${styles.appointment} ${styles[app.status.toLowerCase()]}`}
                                                                 style={{ top: `${top}px`, height: `${height}px` }}
+                                                                onClick={(e) => e.stopPropagation()}
                                                             >
                                                                 <div className={styles.appTime}>
                                                                     {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -266,6 +419,58 @@ export default function AdminPage() {
                                         </div>
                                         <div className={styles.schedulePreview}>
                                             <button onClick={() => openSchedule(barber)} className={styles.smallBtn}>Edit Schedule</button>
+                                            <button onClick={() => deleteBarber(barber.id)} className={styles.deleteBtn} style={{ marginLeft: '0.5rem' }}>Delete</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {tab === 'services' && (
+                        <div className={styles.manageContainer}>
+                            <div className={styles.addBarber}>
+                                <h2>Add New Service</h2>
+                                <form onSubmit={addService} className={styles.rowForm}>
+                                    <input
+                                        type="text"
+                                        placeholder="Service Name"
+                                        value={newService.name}
+                                        onChange={e => setNewService({ ...newService, name: e.target.value })}
+                                        className={styles.input}
+                                        required
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Duration (min)"
+                                        value={newService.duration}
+                                        onChange={e => setNewService({ ...newService, duration: parseInt(e.target.value) })}
+                                        className={styles.input}
+                                        style={{ flex: '0 0 100px' }}
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Price ($)"
+                                        value={newService.price}
+                                        onChange={e => setNewService({ ...newService, price: parseFloat(e.target.value) })}
+                                        className={styles.input}
+                                        style={{ flex: '0 0 100px' }}
+                                    />
+                                    <button type="submit" className={styles.button}>Add Service</button>
+                                </form>
+                            </div>
+
+                            <div className={styles.barberList}>
+                                {services.map(service => (
+                                    <div key={service.id} className={styles.barberCard}>
+                                        <div className={styles.barberName}>
+                                            {service.name}
+                                            <span style={{ fontSize: '0.9rem', fontWeight: 'normal', marginLeft: '1rem', color: '#888' }}>
+                                                {service.duration} min | ${service.price}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <button onClick={() => deleteService(service.id)} className={styles.deleteBtn}>Delete</button>
                                         </div>
                                     </div>
                                 ))}

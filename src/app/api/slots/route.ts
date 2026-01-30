@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const barberId = searchParams.get('barberId');
@@ -10,7 +12,8 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Missing params' }, { status: 400 });
     }
 
-    const date = new Date(dateStr);
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     const dayOfWeek = date.getDay(); // 0-6
 
     // 1. Get Barber Schedule for this day
@@ -24,7 +27,7 @@ export async function GET(request: Request) {
     });
 
     if (!schedule || !schedule.active) {
-        return NextResponse.json({ slots: [] }); // Not working today
+        return NextResponse.json([]); // Not working today
     }
 
     // 2. Generate possible slots

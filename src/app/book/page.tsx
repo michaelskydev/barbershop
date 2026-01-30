@@ -41,7 +41,7 @@ export default function BookPage() {
     useEffect(() => {
         if (selectedBarber && selectedDate) {
             setLoadingSlots(true);
-            fetch(`/api/slots?barberId=${selectedBarber.id}&date=${selectedDate}`)
+            fetch(`/api/slots?barberId=${selectedBarber.id}&date=${selectedDate}`, { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
                     setAvailableSlots(data || []);

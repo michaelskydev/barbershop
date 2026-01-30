@@ -31,10 +31,10 @@ model Appointment {
   status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
   
   barberId      Int
-  barber        Barber   @relation(fields: [barberId], references: [id])
+  barber        Barber   @relation(fields: [barberId], references: [id], onDelete: Cascade)
   
   serviceId     Int
-  service       Service  @relation(fields: [serviceId], references: [id])
+  service       Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 }
 
 model Admin {
@@ -51,7 +51,7 @@ model Schedule {
   active    Boolean @default(true)
   
   barberId  Int
-  barber    Barber  @relation(fields: [barberId], references: [id])
+  barber    Barber  @relation(fields: [barberId], references: [id], onDelete: Cascade)
 
   @@unique([barberId, dayOfWeek])
 }
