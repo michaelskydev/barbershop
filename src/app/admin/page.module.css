@@ -77,6 +77,10 @@
     font-size: 1rem;
 }
 
+.datePicker::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
 .calendar {
     display: flex;
     background: var(--surface);
@@ -251,8 +255,29 @@
 
 .rowForm {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     margin-top: 1rem;
+    align-items: flex-end;
+    /* Align button with inputs */
+}
+
+.formField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.formField label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.numericField {
+    flex: 0 0 120px;
 }
 
 .input {
@@ -584,4 +609,117 @@
     border-color: #fff;
     color: #fff;
     background: rgba(255, 255, 255, 0.05);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .headerTop {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .controls {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab,
+    .activeTab {
+        white-space: nowrap;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .calendar {
+        border-radius: 4px;
+    }
+
+    .timeline {
+        width: 60px;
+    }
+
+    .timeLabel {
+        font-size: 0.75rem;
+    }
+
+    .col {
+        min-width: 150px;
+        /* Slimmer columns on mobile */
+    }
+
+    .colHeader {
+        font-size: 0.875rem;
+    }
+
+    .modal,
+    .styledModal {
+        width: 95%;
+        max-width: none;
+        margin: 10px;
+    }
+
+    .modalBody {
+        padding: 1.25rem;
+    }
+
+    .section {
+        padding: 1rem;
+    }
+
+    .value {
+        font-size: 1.1rem;
+    }
+
+    .statusActions {
+        grid-template-columns: 1fr;
+        /* Stack action buttons on narrow screens */
+        gap: 0.75rem;
+    }
+
+    .rowForm {
+        flex-direction: column;
+        align-items: stretch;
+        /* Full width children */
+        gap: 1rem;
+    }
+
+    .formField {
+        width: 100%;
+        flex: none !important;
+        /* Override inline flex if any */
+    }
+
+    .numericField {
+        flex: none !important;
+        width: 100% !important;
+    }
+
+    .rowForm button {
+        width: 100%;
+        height: auto !important;
+        padding: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .barberCard {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .dayRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .dayName {
+        width: 100%;
+    }
 }

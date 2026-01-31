@@ -469,30 +469,37 @@ export default function AdminPage() {
                             <div className={styles.addBarber}>
                                 <h2>Add New Service</h2>
                                 <form onSubmit={addService} className={styles.rowForm}>
-                                    <input
-                                        type="text"
-                                        placeholder="Service Name"
-                                        value={newService.name}
-                                        onChange={e => setNewService({ ...newService, name: e.target.value })}
-                                        className={styles.input}
-                                        required
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="Duration (min)"
-                                        value={newService.duration}
-                                        onChange={e => setNewService({ ...newService, duration: parseInt(e.target.value) })}
-                                        className={styles.input}
-                                        style={{ flex: '0 0 100px' }}
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="Price ($)"
-                                        value={newService.price}
-                                        onChange={e => setNewService({ ...newService, price: parseFloat(e.target.value) })}
-                                        className={styles.input}
-                                        style={{ flex: '0 0 100px' }}
-                                    />
+                                    <div className={styles.formField}>
+                                        <label>Service Name</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Beard Trim"
+                                            value={newService.name}
+                                            onChange={e => setNewService({ ...newService, name: e.target.value })}
+                                            className={styles.input}
+                                            required
+                                        />
+                                    </div>
+                                    <div className={`${styles.formField} ${styles.numericField}`}>
+                                        <label>Duration</label>
+                                        <input
+                                            type="number"
+                                            placeholder="Mins"
+                                            value={newService.duration}
+                                            onChange={e => setNewService({ ...newService, duration: parseInt(e.target.value) })}
+                                            className={styles.input}
+                                        />
+                                    </div>
+                                    <div className={`${styles.formField} ${styles.numericField}`}>
+                                        <label>Price</label>
+                                        <input
+                                            type="number"
+                                            placeholder="USD"
+                                            value={newService.price}
+                                            onChange={e => setNewService({ ...newService, price: parseFloat(e.target.value) })}
+                                            className={styles.input}
+                                        />
+                                    </div>
                                     <button type="submit" className={styles.button}>Add Service</button>
                                 </form>
                             </div>
