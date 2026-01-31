@@ -13,6 +13,35 @@
     border-bottom: 1px solid #333;
 }
 
+/* Two-column layout if space permits, or stacked */
+.infoRow {
+    display: flex;
+    flex-direction: column;
+    /* Stack vertically for "column" look per item */
+    align-items: flex-start;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #333;
+}
+
+.infoRow:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-size: 0.85rem;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    text-align: left;
+}
+
 .headerTop {
     display: flex;
     justify-content: space-between;
@@ -208,10 +237,17 @@
 .input {
     flex: 1;
     padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: #2a2a2a;
+    /* Solid background for inputs */
     border: 1px solid #444;
-    color: var(--text);
+    color: #fff;
     border-radius: var(--radius);
+}
+
+.input option {
+    background-color: #2a2a2a;
+    color: #fff;
+    padding: 10px;
 }
 
 .colorParams {
@@ -286,6 +322,17 @@
     border-radius: var(--radius);
     width: 90%;
     max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.styledModal {
+    background: transparent;
+    padding: 0;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
 }
 
 .scheduleGrid {
@@ -357,12 +404,163 @@
     padding: 0.5rem 1rem;
     background: transparent;
     border: 1px solid #444;
-    color: var(--text-muted);
-    border-radius: var(--radius);
+    border: 2px solid #555;
+    color: #aaa;
+    padding: 0.75rem;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.2s;
 }
 
 .logoutBtn:hover {
-    color: var(--text);
-    border-color: var(--text);
+    color: #fff;
+    border-color: #fff;
+}
+
+/* Polished Modal Styles */
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+    padding: 1.5rem;
+    background: #1a1a1a;
+    /* Default fallback */
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius) var(--radius) 0 0;
+    color: white;
+}
+
+/* Status-based Header Colors */
+.headerPending {
+    background: linear-gradient(135deg, #ffa726, #fb8c00);
+}
+
+.headerApproved {
+    background: linear-gradient(135deg, #66bb6a, #43a047);
+}
+
+.headerRejected {
+    background: linear-gradient(135deg, #ef5350, #e53935);
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-weight: 800;
+}
+
+.statusBadge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.modalBody {
+    background: #222;
+    padding: 2rem;
+    color: #fff;
+}
+
+.section {
+    background: #2a2a2a;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #444;
+}
+
+.sectionTitle {
+    color: var(--primary);
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.modalFooter {
+    background: #1a1a1a;
+    padding: 1.5rem;
+    border-top: 1px solid #333;
+    border-radius: 0 0 var(--radius) var(--radius);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.statusActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+}
+
+.actionBtn {
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    color: white;
+    transition: transform 0.1s, opacity 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.actionBtn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.actionBtn:active {
+    transform: translateY(0);
+}
+
+.actionBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
+
+.btnApprove {
+    background: linear-gradient(to bottom, #66bb6a, #43a047);
+}
+
+.btnReject {
+    background: linear-gradient(to bottom, #ef5350, #e53935);
+}
+
+.btnPending {
+    background: linear-gradient(to bottom, #ffa726, #fb8c00);
+}
+
+.closeBtn {
+    background: transparent;
+    border: 2px solid #555;
+    color: #aaa;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.closeBtn:hover {
+    border-color: #fff;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
 }

@@ -9,14 +9,18 @@ type Appointment = {
     startDate: string;
     status: string;
     customerName: string;
-    service: { name: string; duration: number };
+    customerEmail: string;
+    customerPhone?: string;
+    service: { name: string; duration: number; price: number };
     barberId: number;
 };
+
 
 export default function AdminPage() {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [barbers, setBarbers] = useState<Barber[]>([]);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
@@ -74,7 +78,7 @@ export default function AdminPage() {
         const data = await res.json();
         // Ensure all days are present
         const fullSchedule = [];
-        for (let i = 1; i <= 6; i++) { // Mon-Sat
+        for (let i = 0; i <= 6; i++) { // Sun-Sat
             const existing = data.find((s: any) => s.dayOfWeek === i);
             fullSchedule.push(existing || { dayOfWeek: i, startTime: '09:00', endTime: '17:00', active: false });
         }
@@ -109,6 +113,7 @@ export default function AdminPage() {
     const [bookingServiceId, setBookingServiceId] = useState<number | null>(null);
     const [bookingCustomerName, setBookingCustomerName] = useState('');
     const [bookingCustomerEmail, setBookingCustomerEmail] = useState('');
+    const [bookingCustomerPhone, setBookingCustomerPhone] = useState('');
     const [services, setServices] = useState<any[]>([]);
 
     useEffect(() => {
@@ -133,11 +138,13 @@ export default function AdminPage() {
                 serviceId: bookingServiceId,
                 startDate: startDateTime.toISOString(),
                 customerName: bookingCustomerName || 'Walk-in',
-                customerEmail: bookingCustomerEmail || 'admin@local'
+                customerEmail: bookingCustomerEmail || 'admin@local',
+                customerPhone: bookingCustomerPhone
             })
         });
         setBookingModalOpen(false);
         setBookingCustomerName('');
+        setBookingCustomerPhone('');
         fetchData();
     };
 
@@ -242,6 +249,14 @@ export default function AdminPage() {
                                 placeholder="Email"
                                 value={bookingCustomerEmail}
                                 onChange={e => setBookingCustomerEmail(e.target.value)}
+                            />
+
+                            <label>Phone (Optional)</label>
+                            <input
+                                className={styles.input}
+                                placeholder="Phone Number"
+                                value={bookingCustomerPhone}
+                                onChange={e => setBookingCustomerPhone(e.target.value)}
                             />
                         </div>
 
@@ -358,12 +373,26 @@ export default function AdminPage() {
                                                         const top = offsetMinutes * (100 / 60);
                                                         const height = app.service.duration * (100 / 60);
 
+                                                        const isRejected = app.status === 'REJECTED';
+                                                        const style: React.CSSProperties = {
+                                                            top: `${top}px`,
+                                                            height: `${height}px`,
+                                                            ...(isRejected ? {
+                                                                width: '30%',
+                                                                left: 'auto',
+                                                                right: 0,
+                                                                opacity: 0.7,
+                                                                zIndex: 5
+                                                            } : {})
+                                                        };
+
                                                         return (
                                                             <div
                                                                 key={app.id}
                                                                 className={`${styles.appointment} ${styles[app.status.toLowerCase()]}`}
-                                                                style={{ top: `${top}px`, height: `${height}px` }}
-                                                                onClick={(e) => e.stopPropagation()}
+                                                                style={style}
+                                                                onClick={(e) => { e.stopPropagation(); setSelectedAppointment(app); }}
+                                                                title="Click to view details"
                                                             >
                                                                 <div className={styles.appTime}>
                                                                     {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -478,6 +507,87 @@ export default function AdminPage() {
                         </div>
                     )}
                 </>
+            )}
+
+            {selectedAppointment && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.styledModal}>
+                        <div className={`${styles.modalHeader} ${styles[`header${selectedAppointment.status.charAt(0).toUpperCase() + selectedAppointment.status.slice(1).toLowerCase()}`]}`}>
+                            <h2>Appointment Details</h2>
+                            <span className={styles.statusBadge}>
+                                {selectedAppointment.status}
+                            </span>
+                        </div>
+
+                        <div className={styles.modalBody}>
+                            <div className={styles.section}>
+                                <div className={styles.sectionTitle}>Customer Info</div>
+                                <div className={styles.infoRow}>
+                                    <span className={styles.label}>Name</span>
+                                    <span className={styles.value}>{selectedAppointment.customerName}</span>
+                                </div>
+                                <div className={styles.infoRow}>
+                                    <span className={styles.label}>Email</span>
+                                    <span className={styles.value}>{selectedAppointment.customerEmail}</span>
+                                </div>
+                                <div className={styles.infoRow}>
+                                    <span className={styles.label}>Phone</span>
+                                    <span className={styles.value}>{selectedAppointment.customerPhone || 'N/A'}</span>
+                                </div>
+                            </div>
+
+                            <div className={styles.section}>
+                                <div className={styles.sectionTitle}>Appointment Info</div>
+                                <div className={styles.infoRow}>
+                                    <span className={styles.label}>Service</span>
+                                    <span className={styles.value}>{selectedAppointment.service.name}</span>
+                                </div>
+                                <div className={styles.infoRow}>
+                                    <span className={styles.label}>Price / Duration</span>
+                                    <span className={styles.value}>${selectedAppointment.service.price} / {selectedAppointment.service.duration} mins</span>
+                                </div>
+                                <div className={styles.infoRow}>
+                                    <span className={styles.label}>Date & Time</span>
+                                    <span className={styles.value}>{new Date(selectedAppointment.startDate).toLocaleString(undefined, {
+                                        weekday: 'short',
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.modalFooter}>
+                            <div className={styles.statusActions}>
+                                <button
+                                    onClick={() => { updateStatus(selectedAppointment.id, 'APPROVED'); setSelectedAppointment(null); }}
+                                    className={`${styles.actionBtn} ${styles.btnApprove}`}
+                                    disabled={selectedAppointment.status === 'APPROVED'}
+                                >
+                                    Approve
+                                </button>
+                                <button
+                                    onClick={() => { updateStatus(selectedAppointment.id, 'REJECTED'); setSelectedAppointment(null); }}
+                                    className={`${styles.actionBtn} ${styles.btnReject}`}
+                                    disabled={selectedAppointment.status === 'REJECTED'}
+                                >
+                                    Reject
+                                </button>
+                                <button
+                                    onClick={() => { updateStatus(selectedAppointment.id, 'PENDING'); setSelectedAppointment(null); }}
+                                    className={`${styles.actionBtn} ${styles.btnPending}`}
+                                    disabled={selectedAppointment.status === 'PENDING'}
+                                >
+                                    Set Pending
+                                </button>
+                            </div>
+                            <button onClick={() => setSelectedAppointment(null)} className={styles.closeBtn}>Close Details</button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

@@ -18,6 +18,7 @@ export default function BookPage() {
     const [selectedTime, setSelectedTime] = useState<string>('');
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -69,7 +70,8 @@ export default function BookPage() {
                     serviceId: selectedService?.id,
                     startDate: startDateTime.toISOString(),
                     customerName,
-                    customerEmail
+                    customerEmail,
+                    customerPhone
                 })
             });
 
@@ -199,6 +201,14 @@ export default function BookPage() {
                                 value={customerEmail}
                                 onChange={e => setCustomerEmail(e.target.value)}
                                 placeholder="john@example.com"
+                            />
+                            <label>Phone Number (Optional)</label>
+                            <input
+                                type="tel"
+                                className={styles.input}
+                                value={customerPhone}
+                                onChange={e => setCustomerPhone(e.target.value)}
+                                placeholder="(555) 123-4567"
                             />
                         </div>
                     )}

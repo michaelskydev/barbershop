@@ -34,7 +34,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { customerName, customerEmail, startDate, barberId, serviceId } = body
+        const { customerName, customerEmail, customerPhone, startDate, barberId, serviceId } = body
 
         // Calculate end date based on service duration
         const service = await prisma.service.findUnique({ where: { id: serviceId } })
@@ -47,6 +47,7 @@ export async function POST(request: Request) {
             data: {
                 customerName,
                 customerEmail,
+                customerPhone,
                 startDate: new Date(startDate),
                 status: 'PENDING',
                 barberId,

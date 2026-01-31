@@ -27,6 +27,7 @@ model Appointment {
   id            Int      @id @default(autoincrement())
   customerName  String
   customerEmail String
+  customerPhone String?
   startDate     DateTime
   status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
   
