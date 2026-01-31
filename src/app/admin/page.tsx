@@ -402,8 +402,16 @@ export default function AdminPage() {
 
                                                                 {app.status === 'PENDING' && (
                                                                     <div className={styles.actions}>
-                                                                        <button onClick={() => updateStatus(app.id, 'APPROVED')} title="Approve">✓</button>
-                                                                        <button onClick={() => updateStatus(app.id, 'REJECTED')} title="Reject">✕</button>
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); updateStatus(app.id, 'APPROVED'); }}
+                                                                            title="Approve"
+                                                                            className={styles.approveAction}
+                                                                        >✓</button>
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); updateStatus(app.id, 'REJECTED'); }}
+                                                                            title="Reject"
+                                                                            className={styles.rejectAction}
+                                                                        >✕</button>
                                                                     </div>
                                                                 )}
                                                             </div>
