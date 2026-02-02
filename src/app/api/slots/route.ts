@@ -13,11 +13,11 @@ export async function GET(request: Request) {
     }
 
     const [year, month, day] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    const dayOfWeek = date.getDay(); // 0-6
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const dayOfWeek = date.getUTCDay(); // 0-6 in UTC
 
     // 1. Get Barber Schedule for this day
-    const schedule = await prisma.schedule.findUnique({
+    const schedule = await (prisma as any).schedule.findUnique({
         where: {
             barberId_dayOfWeek: {
                 barberId: parseInt(barberId),
@@ -36,16 +36,16 @@ export async function GET(request: Request) {
     let [endHour, endMin] = schedule.endTime.split(':').map(Number);
 
     let current = new Date(date);
-    current.setHours(startHour, startMin, 0, 0);
+    current.setUTCHours(startHour, startMin, 0, 0);
 
     const end = new Date(date);
-    end.setHours(endHour, endMin, 0, 0);
+    end.setUTCHours(endHour, endMin, 0, 0);
 
     // 3. Get existing appointments
     const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
+    startOfDay.setUTCHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
     const appointments = await prisma.appointment.findMany({
         where: {
@@ -72,17 +72,17 @@ export async function GET(request: Request) {
         const isTaken = appointments.some(app => {
             const appStart = new Date(app.startDate);
             const appEnd = new Date(appStart);
-            appEnd.setMinutes(appEnd.getMinutes() + app.service.duration);
+            appEnd.setUTCMinutes(appEnd.getUTCMinutes() + app.service.duration);
 
             // Simple overlap check
             return (slotStart < appEnd && slotEnd > appStart);
         });
 
         if (!isTaken) {
-            slots.push(slotStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
+            slots.push(slotStart.toISOString().substring(11, 16)); // "HH:mm" from UTC
         }
 
-        current.setMinutes(current.getMinutes() + 60); // Increment by 1 hour (simplified logic)
+        current.setUTCMinutes(current.getUTCMinutes() + 30); // 30 min granularity
     }
 
     return NextResponse.json(slots);

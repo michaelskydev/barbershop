@@ -3,18 +3,24 @@
 import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import Link from 'next/link';
+import { formatTime12h } from '@/lib/utils';
 
 type Barber = { id: number; name: string; color: string };
 type Service = { id: number; name: string; duration: number; price: number };
 
 export default function BookPage() {
+    const getTodayStr = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
     const [step, setStep] = useState(1);
     const [barbers, setBarbers] = useState<Barber[]>([]);
     const [services, setServices] = useState<Service[]>([]);
 
     const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
     const [selectedService, setSelectedService] = useState<Service | null>(null);
-    const [selectedDate, setSelectedDate] = useState<string>('');
+    const [selectedDate, setSelectedDate] = useState(getTodayStr());
     const [selectedTime, setSelectedTime] = useState<string>('');
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
@@ -59,8 +65,8 @@ export default function BookPage() {
     const handleSubmit = async () => {
         setSubmitting(true);
         try {
-            // Construct date object
-            const startDateTime = new Date(`${selectedDate}T${selectedTime}`);
+            // Construct stable UTC string: "YYYY-MM-DDT09:00:00.000Z"
+            const startDate = `${selectedDate}T${selectedTime}:00.000Z`;
 
             const res = await fetch('/api/appointments', {
                 method: 'POST',
@@ -68,7 +74,7 @@ export default function BookPage() {
                 body: JSON.stringify({
                     barberId: selectedBarber?.id,
                     serviceId: selectedService?.id,
-                    startDate: startDateTime.toISOString(),
+                    startDate: startDate,
                     customerName,
                     customerEmail,
                     customerPhone
@@ -153,7 +159,7 @@ export default function BookPage() {
                             <input
                                 type="date"
                                 className={styles.input}
-                                min={new Date().toISOString().split('T')[0]}
+                                min={getTodayStr()}
                                 value={selectedDate}
                                 onChange={e => {
                                     setSelectedDate(e.target.value);
@@ -169,7 +175,7 @@ export default function BookPage() {
                             >
                                 <option value="">-- Select Time --</option>
                                 {availableSlots.map(time => (
-                                    <option key={time} value={time}>{time}</option>
+                                    <option key={time} value={time}>{formatTime12h(time)}</option>
                                 ))}
                             </select>
                             {availableSlots.length === 0 && selectedDate && !loadingSlots && (
@@ -184,7 +190,7 @@ export default function BookPage() {
                                 <h3>Booking Summary</h3>
                                 <p><strong>Barber:</strong> {selectedBarber?.name}</p>
                                 <p><strong>Service:</strong> {selectedService?.name} (${selectedService?.price})</p>
-                                <p><strong>When:</strong> {selectedDate} at {selectedTime}</p>
+                                <p><strong>When:</strong> {selectedDate} at {formatTime12h(selectedTime)}</p>
                             </div>
                             <label>Your Name</label>
                             <input

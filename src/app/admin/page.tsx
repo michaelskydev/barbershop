@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './page.module.css';
+import { formatTime12h, formatValueTo12h } from '@/lib/utils';
 
 type Barber = { id: number; name: string; color: string; schedules: any[] };
 type Appointment = {
@@ -17,7 +18,11 @@ type Appointment = {
 
 
 export default function AdminPage() {
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const getTodayStr = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+    const [date, setDate] = useState(getTodayStr());
     const [barbers, setBarbers] = useState<Barber[]>([]);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
@@ -120,15 +125,18 @@ export default function AdminPage() {
         fetch('/api/services').then(res => res.json()).then(setServices);
     }, []);
 
-    const handleSlotClick = (barberId: number, hour: number) => {
-        const time = `${hour < 10 ? '0' : ''}${hour}:00`;
+    const handleSlotClick = (barberId: number, slotVal: number) => {
+        const h = Math.floor(slotVal);
+        const m = (slotVal % 1 === 0) ? '00' : '30';
+        const time = `${h < 10 ? '0' : ''}${h}:${m}`;
         setBookingSlot({ barberId, date, time });
         setBookingModalOpen(true);
     };
 
     const handleManualBook = async () => {
         if (!bookingSlot || !bookingServiceId) return;
-        const startDateTime = new Date(`${bookingSlot.date}T${bookingSlot.time}`);
+        // Construct stable UTC string: "YYYY-MM-DDT09:00:00.000Z"
+        const startDate = `${bookingSlot.date}T${bookingSlot.time}:00.000Z`;
 
         await fetch('/api/appointments', {
             method: 'POST',
@@ -136,7 +144,7 @@ export default function AdminPage() {
             body: JSON.stringify({
                 barberId: bookingSlot.barberId,
                 serviceId: bookingServiceId,
-                startDate: startDateTime.toISOString(),
+                startDate: startDate,
                 customerName: bookingCustomerName || 'Walk-in',
                 customerEmail: bookingCustomerEmail || 'admin@local',
                 customerPhone: bookingCustomerPhone
@@ -148,7 +156,7 @@ export default function AdminPage() {
         fetchData();
     };
 
-    const hours = [9, 10, 11, 12, 13, 14, 15, 16, 17]; // 9am to 6pm
+    const hours = [9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5]; // 9am to 6pm in 30min blocks
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     const handleLogout = async () => {
@@ -220,7 +228,7 @@ export default function AdminPage() {
                 <div className={styles.modalOverlay}>
                     <div className={styles.modal}>
                         <h2>Manual Booking</h2>
-                        <p>Time: {bookingSlot.time} on {bookingSlot.date}</p>
+                        <p>Time: {formatTime12h(bookingSlot.time)} on {bookingSlot.date}</p>
 
                         <div className={styles.formGroup}>
                             <label>Service</label>
@@ -317,7 +325,7 @@ export default function AdminPage() {
                                 <div className={styles.timeHeader}></div>
                                 {hours.map(h => (
                                     <div key={h} className={styles.timeLabel}>
-                                        {h > 12 ? h - 12 : h} {h >= 12 ? 'PM' : 'AM'}
+                                        {h % 1 === 0 ? formatValueTo12h(h) : ''}
                                     </div>
                                 ))}
                             </div>
@@ -339,9 +347,11 @@ export default function AdminPage() {
                                                     const schedule = barber.schedules?.find(s => s.dayOfWeek === dayOfWeek);
                                                     let isOpen = false;
                                                     if (schedule && schedule.active) {
-                                                        const startH = parseInt(schedule.startTime.split(':')[0]);
-                                                        const endH = parseInt(schedule.endTime.split(':')[0]);
-                                                        if (h >= startH && h < endH) {
+                                                        const [startH, startM] = schedule.startTime.split(':').map(Number);
+                                                        const [endH, endM] = schedule.endTime.split(':').map(Number);
+                                                        const startVal = startH + (startM / 60);
+                                                        const endVal = endH + (endM / 60);
+                                                        if (h >= startVal && h < endVal) {
                                                             isOpen = true;
                                                         }
                                                     }
@@ -367,8 +377,8 @@ export default function AdminPage() {
                                                     .filter(app => app.barberId === barber.id)
                                                     .map(app => {
                                                         const start = new Date(app.startDate);
-                                                        const startHour = start.getHours();
-                                                        const startMin = start.getMinutes();
+                                                        const startHour = start.getUTCHours();
+                                                        const startMin = start.getUTCMinutes();
                                                         const offsetMinutes = (startHour - 9) * 60 + startMin;
                                                         const top = offsetMinutes * (100 / 60);
                                                         const height = app.service.duration * (100 / 60);
@@ -395,7 +405,7 @@ export default function AdminPage() {
                                                                 title="Click to view details"
                                                             >
                                                                 <div className={styles.appTime}>
-                                                                    {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                    {formatTime12h(`${start.getUTCHours().toString().padStart(2, '0')}:${start.getUTCMinutes().toString().padStart(2, '0')}`)}
                                                                 </div>
                                                                 <div className={styles.appName}>{app.customerName}</div>
                                                                 <div className={styles.appService}>{app.service.name}</div>
@@ -569,7 +579,9 @@ export default function AdminPage() {
                                         month: 'short',
                                         day: 'numeric',
                                         hour: '2-digit',
-                                        minute: '2-digit'
+                                        minute: '2-digit',
+                                        hour12: true,
+                                        timeZone: 'UTC'
                                     })}</span>
                                 </div>
                             </div>

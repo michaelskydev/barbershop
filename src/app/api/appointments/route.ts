@@ -9,11 +9,9 @@ export async function GET(request: Request) {
     const where: any = {}
     if (barberId) where.barberId = parseInt(barberId)
     if (date) {
-        const startOfDay = new Date(date)
-        startOfDay.setHours(0, 0, 0, 0)
-
-        const endOfDay = new Date(date)
-        endOfDay.setHours(23, 59, 59, 999)
+        const [year, month, day] = date.split('-').map(Number);
+        const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+        const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
 
         where.startDate = {
             gte: startOfDay,
@@ -43,16 +41,18 @@ export async function POST(request: Request) {
         // Basic conflict check
         // In a real app, do better overlapping checks
 
+        const appointmentData: any = {
+            customerName,
+            customerEmail,
+            customerPhone,
+            startDate: new Date(startDate),
+            status: 'PENDING',
+            barberId,
+            serviceId
+        };
+
         const appointment = await prisma.appointment.create({
-            data: {
-                customerName,
-                customerEmail,
-                customerPhone,
-                startDate: new Date(startDate),
-                status: 'PENDING',
-                barberId,
-                serviceId
-            }
+            data: appointmentData
         })
 
         return NextResponse.json(appointment)

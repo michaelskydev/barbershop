@@ -102,7 +102,7 @@
 }
 
 .timeLabel {
-    height: 100px;
+    height: 50px;
     /* Must match grid height calculation */
     display: flex;
     justify-content: center;
@@ -144,7 +144,7 @@
 }
 
 .hourCell {
-    height: 100px;
+    height: 50px;
     border-bottom: 1px solid #2a2a2a;
     /* Subtle grid line */
 }
@@ -158,7 +158,8 @@
     border-radius: 4px;
     padding: 5px;
     font-size: 0.75rem;
-    overflow: hidden;
+    overflow: visible;
+    /* Prevent clipping of buttons in small slots */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
@@ -198,20 +199,25 @@
 }
 
 .actions {
-    margin-top: auto;
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
     display: flex;
-    gap: 5px;
-    justify-content: flex-end;
+    gap: 4px;
+    z-index: 10;
 }
 
 .actions button {
     border-radius: 50%;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
     transition: transform 0.1s;
