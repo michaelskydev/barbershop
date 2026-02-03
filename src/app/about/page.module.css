@@ -1,0 +1,244 @@
+.container {
+    min-height: 100vh;
+    background-color: #0c0c0c;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid #222;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.link {
+    color: #888;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.link:hover {
+    color: #fff;
+}
+
+.main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Carousel */
+.carousel {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 4rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    background-size: cover;
+    background-position: center;
+}
+
+.slideActive {
+    opacity: 1;
+}
+
+.carouselOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 3rem;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: #fff;
+}
+
+.carouselOverlay h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Page Intro */
+.intro {
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+.intro h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(45deg, #fff, #888);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.intro p {
+    font-size: 1.2rem;
+    color: #aaa;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 5rem;
+}
+
+.story h2,
+.contactSection h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+}
+
+.story p {
+    color: #aaa;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+/* Contact Form - Glassmorphism */
+.contactForm {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2.5rem;
+    border-radius: 20px;
+}
+
+.formGroup {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.input:focus,
+.textarea:focus {
+    border-color: #666;
+    outline: none;
+}
+
+.textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.button {
+    width: 100%;
+    padding: 1rem;
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.button:hover {
+    background: #eee;
+    transform: translateY(-2px);
+}
+
+/* Location & Hours */
+.infoGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.infoCard {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px solid #222;
+}
+
+.infoCard h3 {
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.infoCard p {
+    color: #aaa;
+    line-height: 1.6;
+}
+
+.mapContainer {
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .intro h1 {
+        font-size: 2.5rem;
+    }
+
+    .carousel {
+        height: 350px;
+    }
+
+    .infoGrid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -7,6 +7,7 @@ export default function Home() {
       <header className={styles.header}>
         <div className={styles.logo}>GENTLEMEN'S CUT</div>
         <nav className={styles.nav}>
+          <Link href="/about" className={styles.link}>About Us</Link>
           <Link href="/admin" className={styles.link}>Admin</Link>
         </nav>
       </header>
