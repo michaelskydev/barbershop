@@ -60,7 +60,7 @@ export default function AdminPage() {
     // Let's do simple list per barber for MVP or a rigid grid
     // Rigid grid is better for "Calendar View"
 
-    const [tab, setTab] = useState<'calendar' | 'barbers' | 'services'>('calendar');
+    const [tab, setTab] = useState<'calendar' | 'barbers' | 'services' | 'about'>('calendar');
     const [newBarberName, setNewBarberName] = useState('');
     const [newBarberColor, setNewBarberColor] = useState('#000000');
 
@@ -121,9 +121,106 @@ export default function AdminPage() {
     const [bookingCustomerPhone, setBookingCustomerPhone] = useState('');
     const [services, setServices] = useState<any[]>([]);
 
+    const [aboutInfo, setAboutInfo] = useState({ story: '', address: '', hours: '', mapsUrl: '' });
+    const [aboutImages, setAboutImages] = useState<any[]>([]);
+    const [isSavingAbout, setIsSavingAbout] = useState(false);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [savingImageId, setSavingImageId] = useState<number | null>(null);
+
+    const fetchAboutData = async () => {
+        const [infoRes, imagesRes] = await Promise.all([
+            fetch('/api/about'),
+            fetch('/api/about/images')
+        ]);
+        const infoData = await infoRes.json();
+        const imagesData = await imagesRes.json();
+        if (infoData) setAboutInfo(infoData);
+        setAboutImages(imagesData);
+    };
+
     useEffect(() => {
         fetch('/api/services').then(res => res.json()).then(setServices);
+        fetchAboutData();
     }, []);
+
+    const handleAboutInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setAboutInfo({ ...aboutInfo, [e.target.name]: e.target.value });
+    };
+
+    const saveAboutInfo = async () => {
+        setIsSavingAbout(true);
+        await fetch('/api/about', {
+            method: 'POST',
+            body: JSON.stringify(aboutInfo),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        setIsSavingAbout(false);
+        alert('About information saved!');
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploadingImage(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.url) {
+                await fetch('/api/about/images', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        url: data.url,
+                        title: 'New Image',
+                        subtitle: 'Add a description',
+                        order: aboutImages.length
+                    }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                await fetchAboutData();
+            }
+        } catch (error) {
+            console.error('Upload failed:', error);
+            alert('Upload failed. Please try again.');
+        } finally {
+            setIsUploadingImage(false);
+        }
+    };
+
+    const deleteAboutImage = async (id: number) => {
+        if (!confirm('Delete this image?')) return;
+        await fetch(`/api/about/images/${id}`, { method: 'DELETE' });
+        fetchAboutData();
+    };
+
+    const handleImageLocalChange = (id: number, field: string, value: string) => {
+        setAboutImages(prev => prev.map(img => img.id === id ? { ...img, [field]: value } : img));
+    };
+
+    const saveAboutImage = async (id: number) => {
+        setSavingImageId(id);
+        const img = aboutImages.find(i => i.id === id);
+        try {
+            await fetch(`/api/about/images/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(img),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            alert('Image details saved!');
+        } catch (error) {
+            console.error('Failed to save image:', error);
+            alert('Failed to save image.');
+        } finally {
+            setSavingImageId(null);
+        }
+    };
 
     const handleSlotClick = (barberId: number, slotVal: number) => {
         const h = Math.floor(slotVal);
@@ -212,6 +309,12 @@ export default function AdminPage() {
                         onClick={() => setTab('services')}
                     >
                         Services
+                    </button>
+                    <button
+                        className={tab === 'about' ? styles.activeTab : styles.tab}
+                        onClick={() => setTab('about')}
+                    >
+                        About Us
                     </button>
                     {tab === 'calendar' && (
                         <input
@@ -528,6 +631,131 @@ export default function AdminPage() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {tab === 'about' && (
+                        <div className={styles.manageContainer}>
+                            <div className={styles.addBarber}>
+                                <h2>Edit About Us</h2>
+                                <div className={styles.formGroup}>
+                                    <div className={styles.formField}>
+                                        <label>Our Story</label>
+                                        <textarea
+                                            name="story"
+                                            value={aboutInfo.story}
+                                            onChange={handleAboutInfoChange}
+                                            className={styles.textarea}
+                                            placeholder="Tell your story..."
+                                        />
+                                    </div>
+                                    <div className={styles.formField}>
+                                        <label>Location / Address</label>
+                                        <textarea
+                                            name="address"
+                                            value={aboutInfo.address}
+                                            onChange={handleAboutInfoChange}
+                                            className={styles.textarea}
+                                            style={{ minHeight: '80px' }}
+                                            placeholder="123 Street, City..."
+                                        />
+                                    </div>
+                                    <div className={styles.formField}>
+                                        <label>Opening Hours</label>
+                                        <textarea
+                                            name="hours"
+                                            value={aboutInfo.hours}
+                                            onChange={handleAboutInfoChange}
+                                            className={styles.textarea}
+                                            style={{ minHeight: '80px' }}
+                                            placeholder="Mon-Fri: 9-5..."
+                                        />
+                                    </div>
+                                    <div className={styles.formField}>
+                                        <label>Google Maps Embed URL</label>
+                                        <input
+                                            type="text"
+                                            name="mapsUrl"
+                                            value={aboutInfo.mapsUrl}
+                                            onChange={handleAboutInfoChange}
+                                            className={styles.input}
+                                            placeholder="https://www.google.com/maps/embed?..."
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={saveAboutInfo}
+                                        className={styles.button}
+                                        disabled={isSavingAbout}
+                                    >
+                                        {isSavingAbout ? 'Saving...' : 'Save Text Changes'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className={styles.addBarber}>
+                                <h2>Carousel Images</h2>
+                                <div
+                                    className={styles.uploadArea}
+                                    onClick={() => !isUploadingImage && document.getElementById('imageUpload')?.click()}
+                                    style={{ opacity: isUploadingImage ? 0.5 : 1, cursor: isUploadingImage ? 'wait' : 'pointer' }}
+                                >
+                                    <p>{isUploadingImage ? 'Uploading image...' : 'Click to upload a new image to the carousel'}</p>
+                                    <input
+                                        id="imageUpload"
+                                        type="file"
+                                        accept="image/*"
+                                        className={styles.hiddenInput}
+                                        onChange={handleImageUpload}
+                                        disabled={isUploadingImage}
+                                    />
+                                </div>
+
+                                <div className={styles.imageGrid}>
+                                    {aboutImages.map(img => (
+                                        <div key={img.id} className={styles.imageCard}>
+                                            <div
+                                                className={styles.imagePreview}
+                                                style={{ backgroundImage: `url(${img.url})` }}
+                                            />
+                                            <div className={styles.imageInfo}>
+                                                <input
+                                                    type="text"
+                                                    value={img.title}
+                                                    onChange={e => handleImageLocalChange(img.id, 'title', e.target.value)}
+                                                    className={styles.input}
+                                                    style={{ marginBottom: '0.5rem', width: '100%' }}
+                                                    placeholder="Title"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={img.subtitle}
+                                                    onChange={e => handleImageLocalChange(img.id, 'subtitle', e.target.value)}
+                                                    className={styles.input}
+                                                    style={{ width: '100%' }}
+                                                    placeholder="Subtitle"
+                                                />
+                                            </div>
+                                            <div className={styles.imageActions}>
+                                                <button
+                                                    onClick={() => saveAboutImage(img.id)}
+                                                    className={styles.button}
+                                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                                                    disabled={savingImageId === img.id}
+                                                >
+                                                    {savingImageId === img.id ? 'Saving...' : 'Save Changes'}
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteAboutImage(img.id)}
+                                                    className={styles.deleteBtn}
+                                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}

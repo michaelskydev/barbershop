@@ -4,38 +4,64 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
 
-const images = [
-    {
-        url: '/images/about-1.png',
-        title: 'Premium Atmosphere',
-        subtitle: 'Experience grooming in a space designed for the modern gentleman.'
-    },
-    {
-        url: '/images/about-2.png',
-        title: 'Master Craftsmanship',
-        subtitle: 'Our tools are as sharp as our skills, ensuring perfection in every cut.'
-    },
-    {
-        url: '/images/about-3.png',
-        title: 'Dedicated Attention',
-        subtitle: 'Every client is unique. Every style is a masterpiece.'
-    }
-];
-
 export default function AboutPage() {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [aboutInfo, setAboutInfo] = useState({
+        story: 'Loading...',
+        address: 'Loading...',
+        hours: 'Loading...',
+        mapsUrl: ''
+    });
+    const [images, setImages] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [infoRes, imagesRes] = await Promise.all([
+                    fetch('/api/about'),
+                    fetch('/api/about/images')
+                ]);
+                const infoData = await infoRes.json();
+                const imagesData = await imagesRes.json();
+
+                if (infoData) setAboutInfo(infoData);
+                setImages(imagesData);
+            } catch (error) {
+                console.error('Failed to fetch about data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        if (images.length === 0) return;
         const timer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % images.length);
         }, 5000);
         return () => clearInterval(timer);
-    }, []);
+    }, [images]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         alert('Thank you for your message! We will get back to you soon.');
     };
+
+    if (loading) {
+        return (
+            <div className={styles.container}>
+                <header className={styles.header}>
+                    <Link href="/" className={styles.logo}>GENTLEMEN'S CUT</Link>
+                </header>
+                <main className={styles.main} style={{ textAlign: 'center', padding: '5rem' }}>
+                    <h1>Loading...</h1>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
@@ -51,10 +77,7 @@ export default function AboutPage() {
             <main className={styles.main}>
                 <section className={styles.intro}>
                     <h1>Our Story</h1>
-                    <p>
-                        Established in 2024, Gentlemen's Cut was born from a vision to redefine the traditional barbershop experience.
-                        We combine old-school techniques with modern aesthetics to provide a service that is both timeless and trendy.
-                    </p>
+                    <p style={{ whiteSpace: 'pre-wrap' }}>{aboutInfo.story}</p>
                 </section>
 
                 <section className={styles.carousel}>
@@ -87,25 +110,27 @@ export default function AboutPage() {
                         <div className={styles.infoGrid}>
                             <div className={styles.infoCard}>
                                 <h3>Location</h3>
-                                <p>5676 Robie Street<br />Halifax, NS B3K 4N5<br />Canada</p>
+                                <p style={{ whiteSpace: 'pre-wrap' }}>{aboutInfo.address}</p>
                             </div>
                             <div className={styles.infoCard}>
                                 <h3>Hours</h3>
-                                <p>Mon - Fri: 9 AM - 8 PM<br />Sat: 10 AM - 6 PM<br />Sun: 11 AM - 4 PM</p>
+                                <p style={{ whiteSpace: 'pre-wrap' }}>{aboutInfo.hours}</p>
                             </div>
                         </div>
 
-                        <div className={styles.mapContainer}>
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2838.745494294406!2d-63.5939223!3d44.6543166!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4b5a21074e2d3161%3A0xc39be27063ea5941!2s5676%20Robie%20St%2C%20Halifax%2C%20NS%20B3K%204N5!5e0!3m2!1sen!2sca!4v1710160000000!5m2!1sen!2sca"
-                                width="100%"
-                                height="300"
-                                style={{ border: 0, borderRadius: '20px' }}
-                                allowFullScreen
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                            ></iframe>
-                        </div>
+                        {aboutInfo.mapsUrl && (
+                            <div className={styles.mapContainer}>
+                                <iframe
+                                    src={aboutInfo.mapsUrl}
+                                    width="100%"
+                                    height="300"
+                                    style={{ border: 0, borderRadius: '20px' }}
+                                    allowFullScreen
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                ></iframe>
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.contactSection}>

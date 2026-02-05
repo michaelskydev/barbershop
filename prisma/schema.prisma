@@ -56,3 +56,21 @@ model Schedule {
 
   @@unique([barberId, dayOfWeek])
 }
+
+model AboutInfo {
+  id        Int      @id @default(1)
+  story     String
+  address   String
+  hours     String
+  mapsUrl   String
+  updatedAt DateTime @updatedAt
+}
+
+model AboutImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  title     String
+  subtitle  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
