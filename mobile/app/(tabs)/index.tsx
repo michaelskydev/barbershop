@@ -1,7 +1,6 @@
-import { StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { StyleSheet, TouchableOpacity, ImageBackground, View, Text } from 'react-native';
 import { Link, router } from 'expo-router';
 
-import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 
 export default function HomeScreen() {
@@ -27,6 +26,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: Colors.dark.background,
   },
   content: {
     alignItems: 'center',

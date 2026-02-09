@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import Link from 'next/link';
 import { formatTime12h } from '@/lib/utils';
+import Calendar from './Calendar';
 
 type Barber = { id: number; name: string; color: string };
 type Service = { id: number; name: string; duration: number; price: number };
@@ -158,31 +159,37 @@ export default function BookPage() {
 
                     {step === 3 && (
                         <div className={styles.formGroup}>
-                            <label>Select Date</label>
-                            <input
-                                type="date"
-                                className={styles.input}
-                                min={getTodayStr()}
-                                value={selectedDate}
-                                onChange={e => {
-                                    setSelectedDate(e.target.value);
+                            <h2 style={{ color: 'var(--primary)', marginBottom: '1rem', textAlign: 'center' }}>Choose Date & Time</h2>
+                            <Calendar
+                                selectedDate={selectedDate}
+                                onDateChange={(newDate) => {
+                                    setSelectedDate(newDate);
                                     setSelectedTime('');
                                 }}
+                                minDate={getTodayStr()}
                             />
-                            <label>Select Time</label>
-                            <select
-                                className={styles.input}
-                                value={selectedTime}
-                                onChange={e => setSelectedTime(e.target.value)}
-                                disabled={!selectedDate || loadingSlots}
-                            >
-                                <option value="">-- Select Time --</option>
-                                {availableSlots.map(time => (
-                                    <option key={time} value={time}>{formatTime12h(time)}</option>
-                                ))}
-                            </select>
-                            {availableSlots.length === 0 && selectedDate && !loadingSlots && (
-                                <p className={styles.errorText}>No available slots for this date.</p>
+
+                            {selectedDate && (
+                                <div style={{ marginTop: '2rem' }}>
+                                    <h3 style={{ fontSize: '1rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Available Slots</h3>
+                                    {loadingSlots ? (
+                                        <div className={styles.loadingSlots}>Checking availability...</div>
+                                    ) : availableSlots.length > 0 ? (
+                                        <div className={styles.slotsGrid}>
+                                            {availableSlots.map(time => (
+                                                <div
+                                                    key={time}
+                                                    className={`${styles.slot} ${selectedTime === time ? styles.selected : ''}`}
+                                                    onClick={() => setSelectedTime(time)}
+                                                >
+                                                    {formatTime12h(time)}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className={styles.errorText}>No available slots for this date.</p>
+                                    )}
+                                </div>
                             )}
                         </div>
                     )}
@@ -190,35 +197,44 @@ export default function BookPage() {
                     {step === 4 && (
                         <div className={styles.formGroup}>
                             <div className={styles.summary}>
-                                <h3>Booking Summary</h3>
+                                <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>Booking Summary</h3>
                                 <p><strong>Barber:</strong> {selectedBarber?.name}</p>
                                 <p><strong>Service:</strong> {selectedService?.name} (${selectedService?.price})</p>
-                                <p><strong>When:</strong> {selectedDate} at {formatTime12h(selectedTime)}</p>
+                                <p><strong>When:</strong> {new Date(selectedDate).toDateString()} at {formatTime12h(selectedTime)}</p>
                             </div>
-                            <label>Your Name</label>
-                            <input
-                                type="text"
-                                className={styles.input}
-                                value={customerName}
-                                onChange={e => setCustomerName(e.target.value)}
-                                placeholder="John Doe"
-                            />
-                            <label>Email Address</label>
-                            <input
-                                type="email"
-                                className={styles.input}
-                                value={customerEmail}
-                                onChange={e => setCustomerEmail(e.target.value)}
-                                placeholder="john@example.com"
-                            />
-                            <label>Phone Number (Optional)</label>
-                            <input
-                                type="tel"
-                                className={styles.input}
-                                value={customerPhone}
-                                onChange={e => setCustomerPhone(e.target.value)}
-                                placeholder="(555) 123-4567"
-                            />
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'block' }}>Full Name</label>
+                                    <input
+                                        type="text"
+                                        className={styles.input}
+                                        value={customerName}
+                                        onChange={e => setCustomerName(e.target.value)}
+                                        placeholder="John Doe"
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'block' }}>Email Address</label>
+                                    <input
+                                        type="email"
+                                        className={styles.input}
+                                        value={customerEmail}
+                                        onChange={e => setCustomerEmail(e.target.value)}
+                                        placeholder="john@example.com"
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'block' }}>Phone Number (Optional)</label>
+                                    <input
+                                        type="tel"
+                                        className={styles.input}
+                                        value={customerPhone}
+                                        onChange={e => setCustomerPhone(e.target.value)}
+                                        placeholder="(555) 123-4567"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

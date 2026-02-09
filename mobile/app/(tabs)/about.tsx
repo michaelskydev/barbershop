@@ -1,6 +1,5 @@
-import { StyleSheet, ScrollView, Image } from 'react-native';
+import { StyleSheet, ScrollView, Image, View, Text } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 
 export default function AboutScreen() {

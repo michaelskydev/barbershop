@@ -32,33 +32,61 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        console.log('Received appointment request:', body); // Debug log
+        console.log('Received appointment request:', JSON.stringify(body, null, 2));
+
         const { customerName, customerEmail, customerPhone, startDate, barberId, serviceId } = body
 
-        // Calculate end date based on service duration
-        const service = await prisma.service.findUnique({ where: { id: serviceId } })
-        if (!service) return NextResponse.json({ error: 'Service not found' }, { status: 400 })
+        if (!barberId || !serviceId || !startDate || !customerName || !customerEmail) {
+            console.error('Missing required fields:', { barberId, serviceId, startDate, customerName, customerEmail });
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
 
-        // Basic conflict check
-        // In a real app, do better overlapping checks
+        // Ensure IDs are numbers
+        const bId = parseInt(String(barberId));
+        const sId = parseInt(String(serviceId));
+
+        if (isNaN(bId) || isNaN(sId)) {
+            console.error('Invalid IDs:', { barberId, serviceId });
+            return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 });
+        }
+
+        // Validate service existence
+        const service = await prisma.service.findUnique({ where: { id: sId } })
+        if (!service) {
+            console.error('Service not found:', sId);
+            return NextResponse.json({ error: 'Service not found' }, { status: 400 });
+        }
+
+        // Validate barber existence
+        const barber = await prisma.barber.findUnique({ where: { id: bId } });
+        if (!barber) {
+            console.error('Barber not found:', bId);
+            return NextResponse.json({ error: 'Barber not found' }, { status: 400 });
+        }
 
         const appointmentData: any = {
             customerName,
             customerEmail,
-            customerPhone,
+            customerPhone: customerPhone || null,
             startDate: new Date(startDate),
             status: 'PENDING',
-            barberId,
-            serviceId
+            barberId: bId,
+            serviceId: sId
         };
+
+        console.log('Creating appointment with data:', JSON.stringify(appointmentData, null, 2));
 
         const appointment = await prisma.appointment.create({
             data: appointmentData
         })
 
+        console.log('Appointment created successfully:', appointment.id);
         return NextResponse.json(appointment)
-    } catch (error) {
-        console.error(error)
-        return NextResponse.json({ error: 'Failed to create appointment' }, { status: 500 })
+    } catch (error: any) {
+        console.error('Error creating appointment:', error)
+        return NextResponse.json({
+            error: 'Failed to create appointment',
+            details: error.message
+        }, { status: 500 })
     }
 }

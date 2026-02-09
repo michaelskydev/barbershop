@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, Platform, View, Text, KeyboardAvoidingView } from 'react-native';
 import { router } from 'expo-router';
+import CalendarPicker from '@/components/CalendarPicker';
 
-import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { API_URL } from '@/constants/Config';
 
@@ -31,6 +30,19 @@ export default function BookScreen() {
     const [customerPhone, setCustomerPhone] = useState('');
 
     const [submitting, setSubmitting] = useState(false);
+    const [bookSuccess, setBookSuccess] = useState(false);
+
+    const resetForm = () => {
+        setStep(1);
+        setSelectedBarber(null);
+        setSelectedService(null);
+        setDate(new Date());
+        setSelectedTime(null);
+        setCustomerName('');
+        setCustomerEmail('');
+        setCustomerPhone('');
+        setBookSuccess(false);
+    };
 
     useEffect(() => {
         fetchBarbersAndServices();
@@ -76,24 +88,22 @@ export default function BookScreen() {
         }
     };
 
-    const handleDateChange = (event: any, selectedDate?: Date) => {
-        if (selectedDate) {
-            setDate(selectedDate);
-            setSelectedTime(null);
-        }
-
-        if (Platform.OS === 'android') {
-            setShowDatePicker(false);
-        }
-    };
-
-    const closeDatePicker = () => {
-        setShowDatePicker(false);
+    const handleDateChange = (selectedDate: Date) => {
+        setDate(selectedDate);
+        setSelectedTime(null);
     };
 
     const handleSubmit = async () => {
+        console.log('handleSubmit triggered');
         if (!customerName || !customerEmail) {
+            console.log('Validation failed: missing name or email');
             Alert.alert('Error', 'Please fill in your name and email.');
+            return;
+        }
+
+        if (!selectedBarber || !selectedService || !selectedTime) {
+            console.log('Validation failed: missing selections', { selectedBarber: !!selectedBarber, selectedService: !!selectedService, selectedTime: !!selectedTime });
+            Alert.alert('Error', 'Please complete all selection steps.');
             return;
         }
 
@@ -102,32 +112,65 @@ export default function BookScreen() {
             const dateStr = date.toISOString().split('T')[0];
             const startDate = `${dateStr}T${selectedTime}:00.000Z`;
 
+            const payload = {
+                barberId: selectedBarber.id,
+                serviceId: selectedService.id,
+                startDate: startDate,
+                customerName,
+                customerEmail,
+                customerPhone
+            };
+
+            console.log('Sending booking request to:', `${API_URL}/appointments`);
+            console.log('Payload:', JSON.stringify(payload));
+
             const res = await fetch(`${API_URL}/appointments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    barberId: selectedBarber?.id,
-                    serviceId: selectedService?.id,
-                    startDate: startDate,
-                    customerName,
-                    customerEmail,
-                    customerPhone
-                }),
+                body: JSON.stringify(payload),
             });
 
+            console.log('Response Status:', res.status);
+
             if (res.ok) {
+                console.log('Booking successful');
+                setBookSuccess(true);
+
+                // Fallback for Web/Browser environments
+                if (Platform.OS === 'web') {
+                    alert('Success: Appointment booked successfully!');
+                }
+
                 Alert.alert('Success', 'Appointment booked successfully!', [
-                    { text: 'OK', onPress: () => router.replace('/') }
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            resetForm();
+                            router.replace('/');
+                        }
+                    }
                 ]);
+
+                // Auto-clear and navigate after a delay if alert is missed
+                setTimeout(() => {
+                    if (bookSuccess) {
+                        resetForm();
+                    }
+                }, 3000);
+
             } else {
-                const errorData = await res.json();
-                throw new Error(errorData.error || 'Booking failed');
+                const errorData = await res.json().catch(() => ({ error: 'Unknown server error' }));
+                console.error('Booking failed server-side:', errorData);
+                throw new Error(errorData.error || errorData.details || 'Booking failed');
             }
         } catch (error) {
+            console.error('handleSubmit error:', error);
             Alert.alert('Booking Error', `Failed: ${error}`);
-            console.error(error);
+            if (Platform.OS === 'web') {
+                alert(`Booking Error: ${error}`);
+            }
         } finally {
             setSubmitting(false);
         }
@@ -145,7 +188,7 @@ export default function BookScreen() {
     const renderStep1 = () => (
         <View style={styles.stepContainer}>
             <Text style={styles.header}>Select Barber</Text>
-            {barbers.map((barber) => (
+            {barbers.map((barber: Barber) => (
                 <TouchableOpacity
                     key={barber.id}
                     style={[styles.card, selectedBarber?.id === barber.id && styles.selectedCard]}
@@ -163,7 +206,7 @@ export default function BookScreen() {
     const renderStep2 = () => (
         <View style={styles.stepContainer}>
             <Text style={styles.header}>Select Service</Text>
-            {services.map((service) => (
+            {services.map((service: Service) => (
                 <TouchableOpacity
                     key={service.id}
                     style={[styles.card, selectedService?.id === service.id && styles.selectedCard]}
@@ -183,51 +226,34 @@ export default function BookScreen() {
         <View style={styles.stepContainer}>
             <Text style={styles.header}>Select Date & Time</Text>
 
-            <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
-                <Text style={styles.inputText}>{date.toDateString()}</Text>
-            </TouchableOpacity>
+            <CalendarPicker
+                selectedDate={date}
+                onDateChange={handleDateChange}
+                minimumDate={new Date()}
+            />
 
-            {showDatePicker && (
-                <View style={Platform.OS === 'ios' ? styles.iosPickerContainer : null}>
-                    {Platform.OS === 'ios' && (
-                        <TouchableOpacity style={styles.doneButton} onPress={closeDatePicker}>
-                            <Text style={styles.doneButtonText}>Done</Text>
-                        </TouchableOpacity>
-                    )}
-                    <DateTimePicker
-                        value={date}
-                        mode="date"
-                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                        onChange={handleDateChange}
-                        minimumDate={(() => {
-                            const d = new Date();
-                            d.setHours(0, 0, 0, 0);
-                            return d;
-                        })()}
-                        textColor={Colors.dark.text}
-                    />
-                </View>
-            )}
-
-            {loadingSlots ? (
-                <Text style={styles.infoText}>Loading slots...</Text>
-            ) : availableSlots.length > 0 ? (
-                <View style={styles.slotsGrid}>
-                    {availableSlots.map((time) => (
-                        <TouchableOpacity
-                            key={time}
-                            style={[styles.timeSlot, selectedTime === time && styles.selectedTimeSlot]}
-                            onPress={() => setSelectedTime(time)}
-                        >
-                            <Text style={[styles.timeText, selectedTime === time && styles.selectedTimeText]}>
-                                {formatTime(time)}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            ) : (
-                <Text style={styles.infoText}>No slots available for this date.</Text>
-            )}
+            <View style={{ marginTop: 25 }}>
+                <Text style={styles.slotsHeader}>Available Times</Text>
+                {loadingSlots ? (
+                    <Text style={styles.infoText}>Loading slots...</Text>
+                ) : availableSlots.length > 0 ? (
+                    <View style={styles.slotsGrid}>
+                        {availableSlots.map((time: string) => (
+                            <TouchableOpacity
+                                key={time}
+                                style={[styles.timeSlot, selectedTime === time && styles.selectedTimeSlot]}
+                                onPress={() => setSelectedTime(time)}
+                            >
+                                <Text style={[styles.timeText, selectedTime === time && styles.selectedTimeText]}>
+                                    {formatTime(time)}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                ) : (
+                    <Text style={styles.infoText}>No slots available for this date.</Text>
+                )}
+            </View>
         </View>
     );
 
@@ -274,40 +300,58 @@ export default function BookScreen() {
     );
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+        >
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                {step === 1 && renderStep1()}
-                {step === 2 && renderStep2()}
-                {step === 3 && renderStep3()}
-                {step === 4 && renderStep4()}
+                {bookSuccess ? (
+                    <View style={styles.successStep}>
+                        <Text style={styles.successTitle}>Booking Confirmed!</Text>
+                        <Text style={styles.successText}>We've received your appointment request. See you soon!</Text>
+                        <TouchableOpacity style={styles.button} onPress={() => { resetForm(); router.replace('/'); }}>
+                            <Text style={styles.buttonText}>Back to Home</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <>
+                        {step === 1 && renderStep1()}
+                        {step === 2 && renderStep2()}
+                        {step === 3 && renderStep3()}
+                        {step === 4 && renderStep4()}
+                    </>
+                )}
             </ScrollView>
 
-            <View style={styles.footer}>
-                {step > 1 && (
-                    <TouchableOpacity style={styles.backButton} onPress={() => setStep(step - 1)}>
-                        <Text style={styles.backButtonText}>Back</Text>
-                    </TouchableOpacity>
-                )}
+            {!bookSuccess && (
+                <View style={styles.footer}>
+                    {step > 1 && (
+                        <TouchableOpacity style={styles.backButton} onPress={() => setStep(step - 1)}>
+                            <Text style={styles.backButtonText}>Back</Text>
+                        </TouchableOpacity>
+                    )}
 
-                {step < 4 ? (
-                    <TouchableOpacity
-                        style={[styles.button, { opacity: (step === 1 && !selectedBarber) || (step === 2 && !selectedService) || (step === 3 && !selectedTime) ? 0.5 : 1 }]}
-                        onPress={() => setStep(step + 1)}
-                        disabled={(step === 1 && !selectedBarber) || (step === 2 && !selectedService) || (step === 3 && !selectedTime)}
-                    >
-                        <Text style={styles.buttonText}>Continue</Text>
-                    </TouchableOpacity>
-                ) : (
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={handleSubmit}
-                        disabled={submitting}
-                    >
-                        <Text style={styles.buttonText}>{submitting ? 'Booking...' : 'Confirm Booking'}</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-        </View>
+                    {step < 4 ? (
+                        <TouchableOpacity
+                            style={[styles.button, { opacity: (step === 1 && !selectedBarber) || (step === 2 && !selectedService) || (step === 3 && !selectedTime) ? 0.5 : 1 }]}
+                            onPress={() => setStep(step + 1)}
+                            disabled={(step === 1 && !selectedBarber) || (step === 2 && !selectedService) || (step === 3 && !selectedTime)}
+                        >
+                            <Text style={styles.buttonText}>Continue</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={handleSubmit}
+                            disabled={submitting}
+                        >
+                            <Text style={styles.buttonText}>{submitting ? 'Booking...' : 'Confirm Booking'}</Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
+            )}
+        </KeyboardAvoidingView>
     );
 }
 
@@ -488,5 +532,30 @@ const styles = StyleSheet.create({
         color: Colors.dark.tint,
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    successStep: {
+        alignItems: 'center',
+        paddingVertical: 50,
+    },
+    successTitle: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: Colors.dark.tint,
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+    successText: {
+        fontSize: 18,
+        color: Colors.dark.text,
+        textAlign: 'center',
+        marginBottom: 30,
+        lineHeight: 26,
+    },
+    slotsHeader: {
+        fontSize: 16,
+        color: Colors.dark.textMuted,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        textTransform: 'uppercase',
     },
 });
