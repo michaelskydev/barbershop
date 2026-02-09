@@ -14,6 +14,12 @@ export default function AboutPage() {
     });
     const [images, setImages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        message: ''
+    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -45,9 +51,27 @@ export default function AboutPage() {
         return () => clearInterval(timer);
     }, [images]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        alert('Thank you for your message! We will get back to you soon.');
+        setFormStatus('submitting');
+
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (res.ok) {
+                setFormStatus('success');
+                setFormData({ name: '', email: '', message: '' });
+            } else {
+                setFormStatus('error');
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            setFormStatus('error');
+        }
     };
 
     if (loading) {
@@ -135,21 +159,55 @@ export default function AboutPage() {
 
                     <div className={styles.contactSection}>
                         <h2>Get In Touch</h2>
-                        <form className={styles.contactForm} onSubmit={handleSubmit}>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>Full Name</label>
-                                <input type="text" className={styles.input} placeholder="John Doe" required />
+                        {formStatus === 'success' ? (
+                            <div className={styles.successMessage}>
+                                <p>Thank you for your message! We will get back to you soon.</p>
+                                <button className={styles.button} onClick={() => setFormStatus('idle')}>Send Another Message</button>
                             </div>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>Email Address</label>
-                                <input type="email" className={styles.input} placeholder="john@example.com" required />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>Message</label>
-                                <textarea className={styles.textarea} placeholder="How can we help you?" required></textarea>
-                            </div>
-                            <button type="submit" className={styles.button}>Send Message</button>
-                        </form>
+                        ) : (
+                            <form className={styles.contactForm} onSubmit={handleSubmit}>
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label}>Full Name</label>
+                                    <input
+                                        type="text"
+                                        className={styles.input}
+                                        placeholder="John Doe"
+                                        required
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label}>Email Address</label>
+                                    <input
+                                        type="email"
+                                        className={styles.input}
+                                        placeholder="john@example.com"
+                                        required
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label}>Message</label>
+                                    <textarea
+                                        className={styles.textarea}
+                                        placeholder="How can we help you?"
+                                        required
+                                        value={formData.message}
+                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                    ></textarea>
+                                </div>
+                                {formStatus === 'error' && <p className={styles.errorText}>Something went wrong. Please try again.</p>}
+                                <button
+                                    type="submit"
+                                    className={styles.button}
+                                    disabled={formStatus === 'submitting'}
+                                >
+                                    {formStatus === 'submitting' ? 'Sending...' : 'Send Message'}
+                                </button>
+                            </form>
+                        )}
                     </div>
                 </section>
             </main>
