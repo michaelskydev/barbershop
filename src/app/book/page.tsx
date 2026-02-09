@@ -83,10 +83,13 @@ export default function BookPage() {
 
             if (res.ok) {
                 setSuccess(true);
+            } else {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to submit booking');
             }
         } catch (error) {
             console.error(error);
-            alert('Something went wrong');
+            alert(`Booking Failed: ${error}`);
         } finally {
             setSubmitting(false);
         }

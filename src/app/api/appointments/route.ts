@@ -32,6 +32,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
+        console.log('Received appointment request:', body); // Debug log
         const { customerName, customerEmail, customerPhone, startDate, barberId, serviceId } = body
 
         // Calculate end date based on service duration
