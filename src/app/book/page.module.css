@@ -24,8 +24,15 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .loading {
@@ -295,4 +302,91 @@
     font-size: 0.875rem;
     margin-top: 0.5rem;
     text-align: center;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.button,
+.buttonSecondary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.button {
+    background-color: var(--primary);
+    color: #1a1a1a;
+    border: 1px solid var(--primary);
+}
+
+.button:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(194, 155, 94, 0.3);
+}
+
+.buttonSecondary {
+    background-color: transparent;
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.buttonSecondary:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.button:disabled,
+.buttonSecondary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.successContainer {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: var(--background);
+    animation: fadeIn 0.8s ease-out;
+}
+
+.successCard {
+    background: rgba(38, 38, 38, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 4rem 2rem;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+}
+
+.successCard h1 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 2rem;
+}
+
+.successCard p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    line-height: 1.6;
 }
