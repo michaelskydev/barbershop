@@ -798,6 +798,119 @@
 
 .uploadArea:hover {
     border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.historyFilters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    align-items: center;
+}
+
+.historyTableContainer {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+.historyTable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.historyTable th {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid #333;
+}
+
+.sortableHeader {
+    transition: all 0.2s;
+}
+
+.sortableHeader:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--primary) !important;
+}
+
+.historyTable td {
+    padding: 1rem;
+    border-bottom: 1px solid #2a2a2a;
+    vertical-align: middle;
+}
+
+.historyTable tr:last-child td {
+    border-bottom: none;
+}
+
+.dateTimeCell {
+    display: flex;
+    flex-direction: column;
+}
+
+.dateText {
+    font-weight: bold;
+}
+
+.timeText {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.customerCell {
+    display: flex;
+    flex-direction: column;
+}
+
+.customerName {
+    font-weight: bold;
+}
+
+.customerSub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.statusBadge.pending {
+    background: rgba(255, 183, 77, 0.2);
+    color: #ffb74d;
+    border-color: rgba(255, 183, 77, 0.3);
+}
+
+.statusBadge.approved {
+    background: rgba(129, 199, 132, 0.2);
+    color: #81c784;
+    border-color: rgba(129, 199, 132, 0.3);
+}
+
+.statusBadge.rejected {
+    background: rgba(229, 115, 115, 0.2);
+    color: #e57373;
+    border-color: rgba(229, 115, 115, 0.3);
+}
+
+@media (max-width: 768px) {
+    .historyFilters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .historyTable th:nth-child(3),
+    .historyTable td:nth-child(3),
+    .historyTable th:nth-child(4),
+    .historyTable td:nth-child(4) {
+        display: none;
+        /* Hide service and barber on very small screens if needed */
+    }
 }
 
 .hiddenInput {

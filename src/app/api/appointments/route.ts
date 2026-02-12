@@ -5,9 +5,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const barberId = searchParams.get('barberId')
     const date = searchParams.get('date')
+    const status = searchParams.get('status')
 
     const where: any = {}
     if (barberId) where.barberId = parseInt(barberId)
+    if (status) where.status = status
     if (date) {
         const [year, month, day] = date.split('-').map(Number);
         const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));

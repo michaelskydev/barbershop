@@ -27,6 +27,10 @@ export default function AdminPage() {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
     const [loading, setLoading] = useState(true);
+    const [historyAppointments, setHistoryAppointments] = useState<Appointment[]>([]);
+    const [historyFilters, setHistoryFilters] = useState({ barberId: '', status: '', search: '' });
+    const [tab, setTab] = useState<'calendar' | 'history' | 'barbers' | 'services' | 'about'>('calendar');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
     const fetchData = async () => {
         setLoading(true);
@@ -41,6 +45,19 @@ export default function AdminPage() {
         setAppointments(appointmentsData);
         setLoading(false);
     };
+
+    const fetchHistory = async () => {
+        let url = `/api/appointments?status=${historyFilters.status}&barberId=${historyFilters.barberId}`;
+        const res = await fetch(url, { cache: 'no-store' });
+        const data = await res.json();
+        setHistoryAppointments(data);
+    };
+
+    useEffect(() => {
+        if (tab === 'history') {
+            fetchHistory();
+        }
+    }, [tab, historyFilters.barberId, historyFilters.status]);
 
     useEffect(() => {
         fetchData();
@@ -60,7 +77,6 @@ export default function AdminPage() {
     // Let's do simple list per barber for MVP or a rigid grid
     // Rigid grid is better for "Calendar View"
 
-    const [tab, setTab] = useState<'calendar' | 'barbers' | 'services' | 'about'>('calendar');
     const [newBarberName, setNewBarberName] = useState('');
     const [newBarberColor, setNewBarberColor] = useState('#000000');
 
@@ -309,6 +325,12 @@ export default function AdminPage() {
                         onClick={() => setTab('services')}
                     >
                         Services
+                    </button>
+                    <button
+                        className={tab === 'history' ? styles.activeTab : styles.tab}
+                        onClick={() => setTab('history')}
+                    >
+                        History
                     </button>
                     <button
                         className={tab === 'about' ? styles.activeTab : styles.tab}
@@ -756,6 +778,111 @@ export default function AdminPage() {
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+                        </div>
+                    )}
+                    {tab === 'history' && (
+                        <div className={styles.manageContainer}>
+                            <div className={styles.historyFilters}>
+                                <input
+                                    type="text"
+                                    placeholder="Search by name, email or phone..."
+                                    value={historyFilters.search}
+                                    onChange={e => setHistoryFilters({ ...historyFilters, search: e.target.value })}
+                                    className={styles.input}
+                                />
+                                <select
+                                    value={historyFilters.barberId}
+                                    onChange={e => setHistoryFilters({ ...historyFilters, barberId: e.target.value })}
+                                    className={styles.input}
+                                >
+                                    <option value="">All Barbers</option>
+                                    {barbers.map(b => (
+                                        <option key={b.id} value={b.id}>{b.name}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={historyFilters.status}
+                                    onChange={e => setHistoryFilters({ ...historyFilters, status: e.target.value })}
+                                    className={styles.input}
+                                >
+                                    <option value="">All Statuses</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="APPROVED">Approved</option>
+                                    <option value="REJECTED">Rejected</option>
+                                </select>
+                            </div>
+
+                            <div className={styles.historyTableContainer}>
+                                <table className={styles.historyTable}>
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                                style={{ cursor: 'pointer', userSelect: 'none' }}
+                                                className={styles.sortableHeader}
+                                            >
+                                                Date & Time {sortOrder === 'asc' ? '▲' : '▼'}
+                                            </th>
+                                            <th>Customer</th>
+                                            <th>Service</th>
+                                            <th>Barber</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {historyAppointments
+                                            .filter(app => {
+                                                if (!historyFilters.search) return true;
+                                                const s = historyFilters.search.toLowerCase();
+                                                return app.customerName.toLowerCase().includes(s) ||
+                                                    app.customerEmail.toLowerCase().includes(s) ||
+                                                    (app.customerPhone && app.customerPhone.includes(s));
+                                            })
+                                            .sort((a, b) => {
+                                                const dateA = new Date(a.startDate).getTime();
+                                                const dateB = new Date(b.startDate).getTime();
+                                                return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+                                            })
+                                            .map(app => (
+                                                <tr key={app.id}>
+                                                    <td>
+                                                        <div className={styles.dateTimeCell}>
+                                                            <div className={styles.dateText}>{new Date(app.startDate).toLocaleDateString()}</div>
+                                                            <div className={styles.timeText}>
+                                                                {formatTime12h(`${new Date(app.startDate).getUTCHours().toString().padStart(2, '0')}:${new Date(app.startDate).getUTCMinutes().toString().padStart(2, '0')}`)}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className={styles.customerCell}>
+                                                            <div className={styles.customerName}>{app.customerName}</div>
+                                                            <div className={styles.customerSub}>{app.customerEmail}</div>
+                                                            {app.customerPhone && <div className={styles.customerSub}>{app.customerPhone}</div>}
+                                                        </div>
+                                                    </td>
+                                                    <td>{app.service.name}</td>
+                                                    <td>
+                                                        {barbers.find(b => b.id === app.barberId)?.name || 'Unknown'}
+                                                    </td>
+                                                    <td>
+                                                        <span className={`${styles.statusBadge} ${styles[app.status.toLowerCase()]}`}>
+                                                            {app.status}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            onClick={() => setSelectedAppointment(app)}
+                                                            className={styles.smallBtn}
+                                                        >
+                                                            View
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     )}
