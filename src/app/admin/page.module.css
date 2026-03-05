@@ -542,6 +542,15 @@
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
+.rescheduleForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
 .modalFooter {
     background: #1a1a1a;
     padding: 1.5rem;
@@ -596,6 +605,18 @@
 
 .btnPending {
     background: linear-gradient(to bottom, #ffa726, #fb8c00);
+}
+
+.btnReschedule {
+    background: linear-gradient(to bottom, #4facfe, #00f2fe);
+}
+
+.fourCols {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.rescheduleActions {
+    grid-template-columns: 1fr 1fr;
 }
 
 .closeBtn {
@@ -682,7 +703,9 @@
         font-size: 1.1rem;
     }
 
-    .statusActions {
+    .statusActions,
+    .fourCols,
+    .rescheduleActions {
         grid-template-columns: 1fr;
         /* Stack action buttons on narrow screens */
         gap: 0.75rem;

@@ -9,11 +9,16 @@ export async function PATCH(
         const { id: idStr } = await params;
         const id = parseInt(idStr);
         const body = await request.json();
-        const { status } = body;
+        const { status, startDate, barberId } = body;
+
+        const updateData: any = {};
+        if (status !== undefined) updateData.status = status;
+        if (startDate !== undefined) updateData.startDate = startDate;
+        if (barberId !== undefined) updateData.barberId = parseInt(barberId);
 
         const appointment = await prisma.appointment.update({
             where: { id },
-            data: { status }
+            data: updateData
         });
 
         return NextResponse.json(appointment);

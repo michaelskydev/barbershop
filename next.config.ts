@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
         ]
       }
     ]
+  },
+  experimental: {
+    allowedDevOrigins: [
+      "10.2.32.31",
+      "http://10.2.32.31",
+      "app://10.2.32.31",
+      "exp://10.2.32.31"
+    ]
   }
 };
 

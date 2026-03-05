@@ -31,6 +31,8 @@ export default function AdminPage() {
     const [historyFilters, setHistoryFilters] = useState({ barberId: '', status: '', search: '' });
     const [tab, setTab] = useState<'calendar' | 'history' | 'barbers' | 'services' | 'about'>('calendar');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    const [isRescheduling, setIsRescheduling] = useState(false);
+    const [rescheduleData, setRescheduleData] = useState({ date: '', time: '', barberId: '' });
 
     const fetchData = async () => {
         setLoading(true);
@@ -70,6 +72,37 @@ export default function AdminPage() {
             body: JSON.stringify({ status })
         });
         fetchData();
+        if (tab === 'history') fetchHistory();
+    };
+
+    const openReschedule = () => {
+        if (!selectedAppointment) return;
+        const d = new Date(selectedAppointment.startDate);
+        const dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+        const timeStr = `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+        setRescheduleData({ date: dateStr, time: timeStr, barberId: selectedAppointment.barberId.toString() });
+        setIsRescheduling(true);
+    };
+
+    const submitReschedule = async () => {
+        if (!selectedAppointment) return;
+        const [year, month, day] = rescheduleData.date.split('-').map(Number);
+        const [hour, minute] = rescheduleData.time.split(':').map(Number);
+        const newStartDate = new Date(Date.UTC(year, month - 1, day, hour, minute));
+
+        await fetch(`/api/appointments/${selectedAppointment.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                startDate: newStartDate.toISOString(),
+                barberId: parseInt(rescheduleData.barberId)
+            })
+        });
+
+        setIsRescheduling(false);
+        fetchData();
+        if (tab === 'history') fetchHistory();
+        setSelectedAppointment(null);
     };
 
     // Helper to position items on grid
@@ -926,47 +959,97 @@ export default function AdminPage() {
                                     <span className={styles.label}>Price / Duration</span>
                                     <span className={styles.value}>${selectedAppointment.service.price} / {selectedAppointment.service.duration} mins</span>
                                 </div>
-                                <div className={styles.infoRow}>
-                                    <span className={styles.label}>Date & Time</span>
-                                    <span className={styles.value}>{new Date(selectedAppointment.startDate).toLocaleString(undefined, {
-                                        weekday: 'short',
-                                        year: 'numeric',
-                                        month: 'short',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: true,
-                                        timeZone: 'UTC'
-                                    })}</span>
-                                </div>
+
+                                {isRescheduling ? (
+                                    <div className={styles.rescheduleForm}>
+                                        <div className={styles.infoRow}>
+                                            <span className={styles.label}>Barber</span>
+                                            <select
+                                                className={styles.input}
+                                                value={rescheduleData.barberId}
+                                                onChange={e => setRescheduleData({ ...rescheduleData, barberId: e.target.value })}
+                                            >
+                                                {barbers.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className={styles.infoRow}>
+                                            <span className={styles.label}>Date</span>
+                                            <input
+                                                type="date"
+                                                className={styles.input}
+                                                value={rescheduleData.date}
+                                                onChange={e => setRescheduleData({ ...rescheduleData, date: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className={styles.infoRow}>
+                                            <span className={styles.label}>Time (24h)</span>
+                                            <input
+                                                type="time"
+                                                className={styles.input}
+                                                value={rescheduleData.time}
+                                                onChange={e => setRescheduleData({ ...rescheduleData, time: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={styles.infoRow}>
+                                            <span className={styles.label}>Barber</span>
+                                            <span className={styles.value}>{barbers.find(b => b.id === selectedAppointment.barberId)?.name || 'Unknown'}</span>
+                                        </div>
+                                        <div className={styles.infoRow}>
+                                            <span className={styles.label}>Date & Time</span>
+                                            <span className={styles.value}>{new Date(selectedAppointment.startDate).toLocaleString(undefined, {
+                                                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                                                hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC'
+                                            })}</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
 
                         <div className={styles.modalFooter}>
-                            <div className={styles.statusActions}>
-                                <button
-                                    onClick={() => { updateStatus(selectedAppointment.id, 'APPROVED'); setSelectedAppointment(null); }}
-                                    className={`${styles.actionBtn} ${styles.btnApprove}`}
-                                    disabled={selectedAppointment.status === 'APPROVED'}
-                                >
-                                    Approve
-                                </button>
-                                <button
-                                    onClick={() => { updateStatus(selectedAppointment.id, 'REJECTED'); setSelectedAppointment(null); }}
-                                    className={`${styles.actionBtn} ${styles.btnReject}`}
-                                    disabled={selectedAppointment.status === 'REJECTED'}
-                                >
-                                    Reject
-                                </button>
-                                <button
-                                    onClick={() => { updateStatus(selectedAppointment.id, 'PENDING'); setSelectedAppointment(null); }}
-                                    className={`${styles.actionBtn} ${styles.btnPending}`}
-                                    disabled={selectedAppointment.status === 'PENDING'}
-                                >
-                                    Set Pending
-                                </button>
-                            </div>
-                            <button onClick={() => setSelectedAppointment(null)} className={styles.closeBtn}>Close Details</button>
+                            {isRescheduling ? (
+                                <div className={`${styles.statusActions} ${styles.rescheduleActions}`}>
+                                    <button onClick={() => setIsRescheduling(false)} className={`${styles.actionBtn}`} style={{ background: '#555' }}>
+                                        Cancel
+                                    </button>
+                                    <button onClick={submitReschedule} className={`${styles.actionBtn} ${styles.btnApprove}`}>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className={`${styles.statusActions} ${styles.fourCols}`}>
+                                        <button
+                                            onClick={() => { updateStatus(selectedAppointment.id, 'APPROVED'); setSelectedAppointment(null); }}
+                                            className={`${styles.actionBtn} ${styles.btnApprove}`}
+                                            disabled={selectedAppointment.status === 'APPROVED'}
+                                        >
+                                            Approve
+                                        </button>
+                                        <button
+                                            onClick={() => { updateStatus(selectedAppointment.id, 'REJECTED'); setSelectedAppointment(null); }}
+                                            className={`${styles.actionBtn} ${styles.btnReject}`}
+                                            disabled={selectedAppointment.status === 'REJECTED'}
+                                        >
+                                            Reject
+                                        </button>
+                                        <button
+                                            onClick={() => { updateStatus(selectedAppointment.id, 'PENDING'); setSelectedAppointment(null); }}
+                                            className={`${styles.actionBtn} ${styles.btnPending}`}
+                                            disabled={selectedAppointment.status === 'PENDING'}
+                                        >
+                                            Set Pending
+                                        </button>
+                                        <button onClick={openReschedule} className={`${styles.actionBtn} ${styles.btnReschedule}`}>
+                                            Reschedule
+                                        </button>
+                                    </div>
+                                    <button onClick={() => { setSelectedAppointment(null); setIsRescheduling(false); }} className={styles.closeBtn}>Close Details</button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
