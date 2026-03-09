@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sendEmail, generateICS, FullAppointment } from '@/lib/email'
 
 export async function PATCH(
     request: Request,
@@ -18,8 +19,56 @@ export async function PATCH(
 
         const appointment = await prisma.appointment.update({
             where: { id },
-            data: updateData
+            data: updateData,
+            include: { barber: true, service: true }
         });
+
+        // Email Notifications
+        const formattedDate = new Date(appointment.startDate).toLocaleString(undefined, {
+            weekday: 'long', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        if (status === 'APPROVED') {
+            const icsString = generateICS(appointment as FullAppointment);
+            await sendEmail({
+                to: appointment.customerEmail,
+                subject: 'Booking Confirmed!',
+                html: `
+                    <h2>Great news, ${appointment.customerName}!</h2>
+                    <p>Your appointment for a <strong>${appointment.service.name}</strong> with <strong>${appointment.barber.name}</strong> has been confirmed.</p>
+                    <p><strong>Date & Time:</strong> ${formattedDate}</p>
+                    <p>We've attached a calendar invite so you don't forget. See you soon!</p>
+                `,
+                icsString
+            });
+        } else if (status === 'REJECTED') {
+            await sendEmail({
+                to: appointment.customerEmail,
+                subject: 'Booking Update',
+                html: `
+                    <h2>Hello ${appointment.customerName},</h2>
+                    <p>Unfortunately, we cannot accommodate your appointment request for a <strong>${appointment.service.name}</strong> on ${formattedDate}.</p>
+                    <p>Please visit our site to book a different time.</p>
+                `
+            });
+        } else if (startDate !== undefined || barberId !== undefined) {
+            // It was rescheduled
+            const icsString = generateICS(appointment as FullAppointment);
+            await sendEmail({
+                to: appointment.customerEmail,
+                subject: 'Your Booking was Rescheduled',
+                html: `
+                    <h2>Hello ${appointment.customerName},</h2>
+                    <p>Your appointment has been updated by the barbershop.</p>
+                    <p><strong>New Service:</strong> ${appointment.service.name}<br/>
+                    <strong>New Barber:</strong> ${appointment.barber.name}<br/>
+                    <strong>New Date & Time:</strong> ${formattedDate}</p>
+                    <p>We've attached an updated calendar invite. If this time doesn't work for you, please contact us.</p>
+                `,
+                icsString
+            });
+        }
 
         return NextResponse.json(appointment);
     } catch (error) {

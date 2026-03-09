@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sendEmail } from '@/lib/email'
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
@@ -83,6 +84,27 @@ export async function POST(request: Request) {
         })
 
         console.log('Appointment created successfully:', appointment.id);
+
+        // Send "Booking Received" Email
+        const formattedDate = new Date(startDate).toLocaleString(undefined, {
+            weekday: 'long', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        await sendEmail({
+            to: customerEmail,
+            subject: 'We received your booking request!',
+            html: `
+                <h2>Hello ${customerName},</h2>
+                <p>We've received your appointment request for a <strong>${service.name}</strong> with <strong>${barber.name}</strong>.</p>
+                <p><strong>Requested Date & Time:</strong> ${formattedDate}</p>
+                <br/>
+                <p>Please note: This is just a request. You will receive another email shortly once your barber confirms the appointment.</p>
+                <br/>
+                <p>See you soon,<br>The Barbershop Team</p>
+            `
+        });
+
         return NextResponse.json(appointment)
     } catch (error: any) {
         console.error('Error creating appointment:', error)
