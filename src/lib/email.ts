@@ -37,8 +37,8 @@ export function generateICS(appointment: FullAppointment): string | null {
             endDate.getUTCHours(),
             endDate.getUTCMinutes()
         ],
-        startInputType: 'utc',
-        endInputType: 'utc',
+        startInputType: 'local',
+        endInputType: 'local',
         status: 'CONFIRMED',
         organizer: { name: 'Barbershop', email: fromEmail },
     };
