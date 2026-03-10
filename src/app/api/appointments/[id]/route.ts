@@ -26,8 +26,13 @@ export async function PATCH(
         // Email Notifications
         const formattedDate = new Date(appointment.startDate).toLocaleString(undefined, {
             weekday: 'long', month: 'long', day: 'numeric',
-            hour: '2-digit', minute: '2-digit'
+            hour: '2-digit', minute: '2-digit', timeZone: 'UTC'
         });
+
+        const aboutInfo = await prisma.aboutInfo.findFirst();
+        const shopLocationHtml = aboutInfo ? `
+            <p><strong>Location:</strong> <a href="${aboutInfo.mapsUrl}">${aboutInfo.address}</a></p>
+        ` : '';
 
         if (status === 'APPROVED') {
             const icsString = generateICS(appointment as FullAppointment);
@@ -38,6 +43,7 @@ export async function PATCH(
                     <h2>Great news, ${appointment.customerName}!</h2>
                     <p>Your appointment for a <strong>${appointment.service.name}</strong> with <strong>${appointment.barber.name}</strong> has been confirmed.</p>
                     <p><strong>Date & Time:</strong> ${formattedDate}</p>
+                    ${shopLocationHtml}
                     <p>We've attached a calendar invite so you don't forget. See you soon!</p>
                 `,
                 icsString
@@ -64,6 +70,7 @@ export async function PATCH(
                     <p><strong>New Service:</strong> ${appointment.service.name}<br/>
                     <strong>New Barber:</strong> ${appointment.barber.name}<br/>
                     <strong>New Date & Time:</strong> ${formattedDate}</p>
+                    ${shopLocationHtml}
                     <p>We've attached an updated calendar invite. If this time doesn't work for you, please contact us.</p>
                 `,
                 icsString

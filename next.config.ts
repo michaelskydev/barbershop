@@ -14,15 +14,6 @@ const nextConfig: NextConfig = {
         ]
       }
     ]
-  },
-  experimental: {
-    // @ts-expect-error - Future Next.js feature warning requires this property
-    allowedDevOrigins: [
-      "10.2.32.31",
-      "http://10.2.32.31",
-      "app://10.2.32.31",
-      "exp://10.2.32.31"
-    ]
   }
 };
 

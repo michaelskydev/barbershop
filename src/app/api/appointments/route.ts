@@ -88,8 +88,14 @@ export async function POST(request: Request) {
         // Send "Booking Received" Email
         const formattedDate = new Date(startDate).toLocaleString(undefined, {
             weekday: 'long', month: 'long', day: 'numeric',
-            hour: '2-digit', minute: '2-digit'
+            hour: '2-digit', minute: '2-digit', timeZone: 'UTC'
         });
+
+        // Fetch shop info for the email
+        const aboutInfo = await prisma.aboutInfo.findFirst();
+        const shopLocationHtml = aboutInfo ? `
+            <p><strong>Location:</strong> <a href="${aboutInfo.mapsUrl}">${aboutInfo.address}</a></p>
+        ` : '';
 
         await sendEmail({
             to: customerEmail,
@@ -98,6 +104,7 @@ export async function POST(request: Request) {
                 <h2>Hello ${customerName},</h2>
                 <p>We've received your appointment request for a <strong>${service.name}</strong> with <strong>${barber.name}</strong>.</p>
                 <p><strong>Requested Date & Time:</strong> ${formattedDate}</p>
+                ${shopLocationHtml}
                 <br/>
                 <p>Please note: This is just a request. You will receive another email shortly once your barber confirms the appointment.</p>
                 <br/>
