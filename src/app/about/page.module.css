@@ -224,6 +224,20 @@
     margin-top: 2rem;
 }
 
+.mapIframe {
+    border: 0;
+    border-radius: 20px;
+}
+
+.contactInfoCard {
+    margin-top: 2rem;
+}
+
+.contactLink {
+    color: inherit;
+    text-decoration: none;
+}
+
 @media (max-width: 768px) {
     .grid {
         grid-template-columns: 1fr;

@@ -78,7 +78,7 @@ export default function AboutPage() {
         return (
             <div className={styles.container}>
                 <header className={styles.header}>
-                    <Link href="/" className={styles.logo}>GENTLEMEN'S CUT</Link>
+                    <Link href="/" className={styles.logo}>SPLITT ENDS - Stylist & Barber</Link>
                 </header>
                 <main className={styles.main} style={{ textAlign: 'center', padding: '5rem' }}>
                     <h1>Loading...</h1>
@@ -90,7 +90,7 @@ export default function AboutPage() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>GENTLEMEN'S CUT</Link>
+                <Link href="/" className={styles.logo}>SPLITT ENDS - Stylist & Barber</Link>
                 <nav className={styles.nav}>
                     <Link href="/" className={styles.link}>Home</Link>
                     <Link href="/book" className={styles.link}>Book Now</Link>
@@ -123,18 +123,29 @@ export default function AboutPage() {
                     <div className={styles.story}>
                         <h2>Crafting Confidence</h2>
                         <p>
-                            At Gentlemen's Cut, we believe that a great haircut is more than just a service—it's an investment in yourself.
+                            At Splitt Ends, we believe that a great haircut is more than just a service, it's an investment in yourself.
                             Our team of master barbers is dedicated to helping you look and feel your absolute best.
-                        </p>
-                        <p>
                             From classic fades to modern styling, we take the time to understand your unique needs and preferences,
                             ensuring that every visit leaves you walking out with renewed confidence.
+                        </p>
+                        <h3>Cancellation Policy</h3>
+                        <p>
+                            Cancellations accepted up to 24 hours before the scheduled service.
+                            Within 24 hours of the service, cancellations will be charged 50% of the scheduled cost.
                         </p>
 
                         <div className={styles.infoGrid}>
                             <div className={styles.infoCard}>
                                 <h3>Location</h3>
-                                <p style={{ whiteSpace: 'pre-wrap' }}>{aboutInfo.address}</p>
+                                <p style={{ whiteSpace: 'pre-wrap' }}>
+                                    {aboutInfo.address !== 'Loading...' ? (
+                                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(aboutInfo.address)}`} target="_blank" rel="noopener noreferrer" className={styles.contactLink}>
+                                            {aboutInfo.address}
+                                        </a>
+                                    ) : (
+                                        aboutInfo.address
+                                    )}
+                                </p>
                             </div>
                             <div className={styles.infoCard}>
                                 <h3>Hours</h3>
@@ -142,13 +153,13 @@ export default function AboutPage() {
                             </div>
                         </div>
 
-                        {aboutInfo.mapsUrl && (
+                        {(aboutInfo.address && aboutInfo.address !== 'Loading...') && (
                             <div className={styles.mapContainer}>
                                 <iframe
-                                    src={aboutInfo.mapsUrl}
+                                    src={(aboutInfo.mapsUrl && aboutInfo.mapsUrl.includes('embed')) ? aboutInfo.mapsUrl : `https://maps.google.com/maps?q=${encodeURIComponent(aboutInfo.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                                     width="100%"
                                     height="300"
-                                    style={{ border: 0, borderRadius: '20px' }}
+                                    className={styles.mapIframe}
                                     allowFullScreen
                                     loading="lazy"
                                     referrerPolicy="no-referrer-when-downgrade"
@@ -208,7 +219,15 @@ export default function AboutPage() {
                                 </button>
                             </form>
                         )}
+
+                        <div className={`${styles.infoCard} ${styles.contactInfoCard}`}>
+                            <h3>Contact Info</h3>
+                            <p style={{ whiteSpace: 'pre-wrap' }}>
+                                <a href="tel:9024298360" className={styles.contactLink}>(902) 429-8360</a>
+                            </p>
+                        </div>
                     </div>
+
                 </section>
             </main>
         </div>
