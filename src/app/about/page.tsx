@@ -12,7 +12,7 @@ export default function AboutPage() {
         hours: 'Loading...',
         mapsUrl: ''
     });
-    const [images, setImages] = useState<any[]>([]);
+    const [images, setImages] = useState<{url: string, title?: string, subtitle?: string}[]>([]);
     const [loading, setLoading] = useState(true);
     const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
     const [formData, setFormData] = useState({
@@ -80,7 +80,7 @@ export default function AboutPage() {
                 <header className={styles.header}>
                     <Link href="/" className={styles.logo}>SPLITT ENDS - Stylist & Barber</Link>
                 </header>
-                <main className={styles.main} style={{ textAlign: 'center', padding: '5rem' }}>
+                <main className={`${styles.main} ${styles.mainLoading}`}>
                     <h1>Loading...</h1>
                 </main>
             </div>
@@ -101,7 +101,7 @@ export default function AboutPage() {
             <main className={styles.main}>
                 <section className={styles.intro}>
                     <h1>Our Story</h1>
-                    <p style={{ whiteSpace: 'pre-wrap' }}>{aboutInfo.story}</p>
+                    <p className={styles.preWrap}>{aboutInfo.story}</p>
                 </section>
 
                 <section className={styles.carousel}>
@@ -109,7 +109,7 @@ export default function AboutPage() {
                         <div
                             key={index}
                             className={`${styles.slide} ${index === currentSlide ? styles.slideActive : ''}`}
-                            style={{ backgroundImage: `url(${img.url})` }}
+                            style={{ '--bg-image': `url(${img.url})` } as React.CSSProperties}
                         >
                             <div className={styles.carouselOverlay}>
                                 <h2>{img.title}</h2>
@@ -138,7 +138,7 @@ export default function AboutPage() {
                         <div className={styles.infoGrid}>
                             <div className={styles.infoCard}>
                                 <h3>Location</h3>
-                                <p style={{ whiteSpace: 'pre-wrap' }}>
+                                <p className={styles.preWrap}>
                                     {aboutInfo.address !== 'Loading...' ? (
                                         <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(aboutInfo.address)}`} target="_blank" rel="noopener noreferrer" className={styles.contactLink}>
                                             {aboutInfo.address}
@@ -150,7 +150,7 @@ export default function AboutPage() {
                             </div>
                             <div className={styles.infoCard}>
                                 <h3>Hours</h3>
-                                <p style={{ whiteSpace: 'pre-wrap' }}>{aboutInfo.hours}</p>
+                                <p className={styles.preWrap}>{aboutInfo.hours}</p>
                             </div>
                         </div>
 
@@ -161,6 +161,7 @@ export default function AboutPage() {
                                     width="100%"
                                     height="300"
                                     className={styles.mapIframe}
+                                    title="Google Maps Location"
                                     allowFullScreen
                                     loading="lazy"
                                     referrerPolicy="no-referrer-when-downgrade"
@@ -223,7 +224,7 @@ export default function AboutPage() {
 
                         <div className={`${styles.infoCard} ${styles.contactInfoCard}`}>
                             <h3>Contact Info</h3>
-                            <p style={{ whiteSpace: 'pre-wrap' }}>
+                            <p className={styles.preWrap}>
                                 <a href="tel:9024298360" className={styles.contactLink}>(902) 429-8360</a>
                             </p>
                             <p>

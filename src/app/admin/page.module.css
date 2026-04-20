@@ -654,7 +654,7 @@
         width: 100%;
         overflow-x: auto;
         padding-bottom: 0.5rem;
-        -webkit-overflow-scrolling: touch;
+    
     }
 
     .tab,
@@ -808,6 +808,14 @@
     gap: 0.5rem;
     border-top: 1px solid #333;
 }
+
+.ml05 { margin-left: 0.5rem; }
+.serviceMeta { font-size: 0.9rem; font-weight: normal; margin-left: 1rem; color: #888; }
+.textareaSmall { min-height: 80px; }
+.imgInput { width: 100%; }
+.imgInputTop { width: 100%; margin-bottom: 0.5rem; }
+.btnSmall { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+.uploadAreaWait { opacity: 0.5; cursor: wait; }
 
 .uploadArea {
     border: 2px dashed #444;

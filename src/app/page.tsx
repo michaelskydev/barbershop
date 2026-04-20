@@ -15,7 +15,7 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.heroContent}>
           <h1 className={styles.title}>Expert Hair Styling & Barber Services</h1>
-          <p className={styles.subtitle}>Halifax's top barbershop for stylish cuts since 1986.</p>
+          <p className={styles.subtitle}>Halifax&apos;s top barbershop for stylish cuts since 1986.</p>
           <div className={styles.actions}>
             <Link href="/book" className={styles.ctaPrimary}>
               Book Appointment

@@ -11,8 +11,8 @@
     width: 100%;
     max-width: 600px;
     background: rgba(38, 38, 38, 0.7);
-    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
@@ -110,6 +110,35 @@
     font-size: 1.5rem;
     font-weight: 700;
     color: #1a1a1a;
+    background-color: var(--avatar-bg, #eee);
+}
+
+.stepTitle {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.slotsSection {
+    margin-top: 2rem;
+}
+
+.slotsTitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.summaryTitle {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.formLabel {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: block;
 }
 
 .list {
@@ -369,8 +398,8 @@
 
 .successCard {
     background: rgba(38, 38, 38, 0.7);
-    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 4rem 2rem;

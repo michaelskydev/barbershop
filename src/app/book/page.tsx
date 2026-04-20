@@ -130,7 +130,7 @@ export default function BookPage() {
                                     className={`${styles.card} ${selectedBarber?.id === barber.id ? styles.selected : ''}`}
                                     onClick={() => setSelectedBarber(barber)}
                                 >
-                                    <div className={styles.avatar} style={{ backgroundColor: barber.color }}>
+                                    <div className={styles.avatar} style={{ '--avatar-bg': barber.color } as React.CSSProperties}>
                                         {barber.name[0]}
                                     </div>
                                     <h3>{barber.name}</h3>
@@ -159,7 +159,7 @@ export default function BookPage() {
 
                     {step === 3 && (
                         <div className={styles.formGroup}>
-                            <h2 style={{ color: 'var(--primary)', marginBottom: '1rem', textAlign: 'center' }}>Choose Date & Time</h2>
+                            <h2 className={styles.stepTitle}>Choose Date & Time</h2>
                             <Calendar
                                 selectedDate={selectedDate}
                                 onDateChange={(newDate) => {
@@ -170,8 +170,8 @@ export default function BookPage() {
                             />
 
                             {selectedDate && (
-                                <div style={{ marginTop: '2rem' }}>
-                                    <h3 style={{ fontSize: '1rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Available Slots</h3>
+                                <div className={styles.slotsSection}>
+                                    <h3 className={styles.slotsTitle}>Available Slots</h3>
                                     {loadingSlots ? (
                                         <div className={styles.loadingSlots}>Checking availability...</div>
                                     ) : availableSlots.length > 0 ? (
@@ -197,15 +197,15 @@ export default function BookPage() {
                     {step === 4 && (
                         <div className={styles.formGroup}>
                             <div className={styles.summary}>
-                                <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>Booking Summary</h3>
+                                <h3 className={styles.summaryTitle}>Booking Summary</h3>
                                 <p><strong>Barber:</strong> {selectedBarber?.name}</p>
                                 <p><strong>Service:</strong> {selectedService?.name} (${selectedService?.price})</p>
                                 <p><strong>When:</strong> {new Date(selectedDate).toDateString()} at {formatTime12h(selectedTime)}</p>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className={styles.list}>
                                 <div>
-                                    <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'block' }}>Full Name</label>
+                                    <label className={styles.formLabel}>Full Name</label>
                                     <input
                                         type="text"
                                         className={styles.input}
@@ -215,7 +215,7 @@ export default function BookPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'block' }}>Email Address</label>
+                                    <label className={styles.formLabel}>Email Address</label>
                                     <input
                                         type="email"
                                         className={styles.input}
@@ -225,7 +225,7 @@ export default function BookPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'block' }}>Phone Number (Optional)</label>
+                                    <label className={styles.formLabel}>Phone Number (Optional)</label>
                                     <input
                                         type="tel"
                                         className={styles.input}

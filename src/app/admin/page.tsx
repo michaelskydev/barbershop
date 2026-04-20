@@ -375,6 +375,8 @@ export default function AdminPage() {
                         <input
                             type="date"
                             value={date}
+                            title="Date Picker"
+                            placeholder="Select date"
                             onChange={e => setDate(e.target.value)}
                             className={styles.datePicker}
                         />
@@ -393,6 +395,7 @@ export default function AdminPage() {
                             <select
                                 className={styles.input}
                                 value={bookingServiceId || ''}
+                                title="Service"
                                 onChange={e => setBookingServiceId(parseInt(e.target.value))}
                             >
                                 <option value="">Select Service</option>
@@ -445,6 +448,8 @@ export default function AdminPage() {
                                         <input
                                             type="checkbox"
                                             checked={day.active}
+                                            title="Active Day"
+                                            placeholder="Active Day"
                                             onChange={e => handleScheduleChange(index, 'active', e.target.checked)}
                                         />
                                         {days[day.dayOfWeek]}
@@ -454,6 +459,8 @@ export default function AdminPage() {
                                             type="time"
                                             value={day.startTime}
                                             disabled={!day.active}
+                                            title="Start Time"
+                                            placeholder="Start Time"
                                             onChange={e => handleScheduleChange(index, 'startTime', e.target.value)}
                                         />
                                         <span>to</span>
@@ -461,6 +468,8 @@ export default function AdminPage() {
                                             type="time"
                                             value={day.endTime}
                                             disabled={!day.active}
+                                            title="End Time"
+                                            placeholder="End Time"
                                             onChange={e => handleScheduleChange(index, 'endTime', e.target.value)}
                                         />
                                     </div>
@@ -491,7 +500,7 @@ export default function AdminPage() {
                             <div className={styles.grid}>
                                 {barbers.map(barber => (
                                     <div key={barber.id} className={styles.col}>
-                                        <div className={styles.colHeader} style={{ borderTopColor: barber.color }}>
+                                        <div className={styles.colHeader} style={{ '--border-top-color': barber.color } as React.CSSProperties}>
                                             {barber.name}
                                         </div>
                                         <div className={styles.colContent}>
@@ -608,6 +617,8 @@ export default function AdminPage() {
                                     <input
                                         type="color"
                                         value={newBarberColor}
+                                        title="Barber Color"
+                                        placeholder="Barber Color"
                                         onChange={e => setNewBarberColor(e.target.value)}
                                         className={styles.colorParams}
                                     />
@@ -619,12 +630,12 @@ export default function AdminPage() {
                                 {barbers.map(barber => (
                                     <div key={barber.id} className={styles.barberCard}>
                                         <div className={styles.barberName}>
-                                            <span className={styles.colorDot} style={{ backgroundColor: barber.color }}></span>
+                                            <span className={styles.colorDot} style={{ '--bg-color': barber.color } as React.CSSProperties}></span>
                                             {barber.name}
                                         </div>
                                         <div className={styles.schedulePreview}>
                                             <button onClick={() => openSchedule(barber)} className={styles.smallBtn}>Edit Schedule</button>
-                                            <button onClick={() => deleteBarber(barber.id)} className={styles.deleteBtn} style={{ marginLeft: '0.5rem' }}>Delete</button>
+                                            <button onClick={() => deleteBarber(barber.id)} className={`${styles.deleteBtn} ${styles.ml05}`}>Delete</button>
                                         </div>
                                     </div>
                                 ))}
@@ -677,7 +688,7 @@ export default function AdminPage() {
                                     <div key={service.id} className={styles.barberCard}>
                                         <div className={styles.barberName}>
                                             {service.name}
-                                            <span style={{ fontSize: '0.9rem', fontWeight: 'normal', marginLeft: '1rem', color: '#888' }}>
+                                            <span className={styles.serviceMeta}>
                                                 {service.duration} min | ${service.price}
                                             </span>
                                         </div>
@@ -711,8 +722,7 @@ export default function AdminPage() {
                                             name="address"
                                             value={aboutInfo.address}
                                             onChange={handleAboutInfoChange}
-                                            className={styles.textarea}
-                                            style={{ minHeight: '80px' }}
+                                            className={`${styles.textarea} ${styles.textareaSmall}`}
                                             placeholder="123 Street, City..."
                                         />
                                     </div>
@@ -722,8 +732,7 @@ export default function AdminPage() {
                                             name="hours"
                                             value={aboutInfo.hours}
                                             onChange={handleAboutInfoChange}
-                                            className={styles.textarea}
-                                            style={{ minHeight: '80px' }}
+                                            className={`${styles.textarea} ${styles.textareaSmall}`}
                                             placeholder="Mon-Fri: 9-5..."
                                         />
                                     </div>
@@ -751,15 +760,16 @@ export default function AdminPage() {
                             <div className={styles.addBarber}>
                                 <h2>Carousel Images</h2>
                                 <div
-                                    className={styles.uploadArea}
+                                    className={`${styles.uploadArea} ${isUploadingImage ? styles.uploadAreaWait : ''}`}
                                     onClick={() => !isUploadingImage && document.getElementById('imageUpload')?.click()}
-                                    style={{ opacity: isUploadingImage ? 0.5 : 1, cursor: isUploadingImage ? 'wait' : 'pointer' }}
                                 >
                                     <p>{isUploadingImage ? 'Uploading image...' : 'Click to upload a new image to the carousel'}</p>
                                     <input
                                         id="imageUpload"
                                         type="file"
                                         accept="image/*"
+                                        title="Upload Image"
+                                        placeholder="Upload Image"
                                         className={styles.hiddenInput}
                                         onChange={handleImageUpload}
                                         disabled={isUploadingImage}
@@ -771,31 +781,28 @@ export default function AdminPage() {
                                         <div key={img.id} className={styles.imageCard}>
                                             <div
                                                 className={styles.imagePreview}
-                                                style={{ backgroundImage: `url(${img.url})` }}
+                                                style={{ '--bg-image': `url(${img.url})` } as React.CSSProperties}
                                             />
                                             <div className={styles.imageInfo}>
                                                 <input
                                                     type="text"
                                                     value={img.title}
                                                     onChange={e => handleImageLocalChange(img.id, 'title', e.target.value)}
-                                                    className={styles.input}
-                                                    style={{ marginBottom: '0.5rem', width: '100%' }}
+                                                    className={`${styles.input} ${styles.imgInputTop}`}
                                                     placeholder="Title"
                                                 />
                                                 <input
                                                     type="text"
                                                     value={img.subtitle}
                                                     onChange={e => handleImageLocalChange(img.id, 'subtitle', e.target.value)}
-                                                    className={styles.input}
-                                                    style={{ width: '100%' }}
+                                                    className={`${styles.input} ${styles.imgInput}`}
                                                     placeholder="Subtitle"
                                                 />
                                             </div>
                                             <div className={styles.imageActions}>
                                                 <button
                                                     onClick={() => saveAboutImage(img.id)}
-                                                    className={styles.button}
-                                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                                                    className={`${styles.button} ${styles.btnSmall}`}
                                                     disabled={savingImageId === img.id}
                                                 >
                                                     {savingImageId === img.id ? 'Saving...' : 'Save Changes'}
@@ -826,6 +833,7 @@ export default function AdminPage() {
                                 />
                                 <select
                                     value={historyFilters.barberId}
+                                    title="Barber Filter"
                                     onChange={e => setHistoryFilters({ ...historyFilters, barberId: e.target.value })}
                                     className={styles.input}
                                 >
@@ -836,6 +844,7 @@ export default function AdminPage() {
                                 </select>
                                 <select
                                     value={historyFilters.status}
+                                    title="Status Filter"
                                     onChange={e => setHistoryFilters({ ...historyFilters, status: e.target.value })}
                                     className={styles.input}
                                 >
@@ -966,6 +975,7 @@ export default function AdminPage() {
                                             <span className={styles.label}>Barber</span>
                                             <select
                                                 className={styles.input}
+                                                title="Reschedule Barber"
                                                 value={rescheduleData.barberId}
                                                 onChange={e => setRescheduleData({ ...rescheduleData, barberId: e.target.value })}
                                             >
@@ -977,6 +987,8 @@ export default function AdminPage() {
                                             <input
                                                 type="date"
                                                 className={styles.input}
+                                                title="Reschedule Date"
+                                                placeholder="Reschedule Date"
                                                 value={rescheduleData.date}
                                                 onChange={e => setRescheduleData({ ...rescheduleData, date: e.target.value })}
                                             />
@@ -986,6 +998,8 @@ export default function AdminPage() {
                                             <input
                                                 type="time"
                                                 className={styles.input}
+                                                title="Reschedule Time"
+                                                placeholder="Reschedule Time"
                                                 value={rescheduleData.time}
                                                 onChange={e => setRescheduleData({ ...rescheduleData, time: e.target.value })}
                                             />
