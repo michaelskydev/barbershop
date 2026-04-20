@@ -123,9 +123,10 @@ export default function AboutPage() {
                     <div className={styles.story}>
                         <h2>Crafting Confidence</h2>
                         <p>
-                            At Splitt Ends, we believe that a great haircut is more than just a service, it's an investment in yourself.
+                            At Splitt Ends, we believe that a great haircut is more than just a service, it is an investment in yourself.
                             Our team of master barbers is dedicated to helping you look and feel your absolute best.
-                            From classic fades to modern styling, we take the time to understand your unique needs and preferences,
+                        </p>
+                        <p>From classic fades to modern styling, we take the time to understand your unique needs and preferences,
                             ensuring that every visit leaves you walking out with renewed confidence.
                         </p>
                         <h3>Cancellation Policy</h3>
@@ -224,6 +225,10 @@ export default function AboutPage() {
                             <h3>Contact Info</h3>
                             <p style={{ whiteSpace: 'pre-wrap' }}>
                                 <a href="tel:9024298360" className={styles.contactLink}>(902) 429-8360</a>
+                            </p>
+                            <p>
+                                <a href="mailto:splittendssalon@gmail.com" className={styles.contactLink}>Send Email</a>
+
                             </p>
                         </div>
                     </div>
