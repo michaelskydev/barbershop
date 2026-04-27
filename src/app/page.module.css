@@ -37,11 +37,49 @@
   flex: 1;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 4rem;
+  gap: 2rem;
 }
 
 .heroContent {
   max-width: 600px;
+  z-index: 2;
+}
+
+.heroImages {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  z-index: 1;
+}
+
+.heroImageWrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.heroImageWrapper:first-child {
+  width: 280px;
+  height: 380px;
+  transform: translateY(20px);
+}
+
+.heroImageWrapper:last-child {
+  width: 320px;
+  height: 440px;
+  transform: translateY(-20px);
+}
+
+.heroImage {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.heroImageWrapper:hover .heroImage {
+  transform: scale(1.05);
 }
 
 .title {
