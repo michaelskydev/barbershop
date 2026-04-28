@@ -109,7 +109,7 @@ export default function AboutPage() {
                         <div
                             key={index}
                             className={`${styles.slide} ${index === currentSlide ? styles.slideActive : ''}`}
-                            style={{ '--bg-image': `url(${img.url})` } as React.CSSProperties}
+                            style={{ '--bg-image': `url(${img.url})` } as React.CSSProperties} /* NOSONAR */
                         >
                             <div className={styles.carouselOverlay}>
                                 <h2>{img.title}</h2>

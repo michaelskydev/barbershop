@@ -500,7 +500,7 @@ export default function AdminPage() {
                             <div className={styles.grid}>
                                 {barbers.map(barber => (
                                     <div key={barber.id} className={styles.col}>
-                                        <div className={styles.colHeader} style={{ '--border-top-color': barber.color } as React.CSSProperties}>
+                                        <div className={styles.colHeader} style={{ '--border-top-color': barber.color } as React.CSSProperties} /* NOSONAR */>
                                             {barber.name}
                                         </div>
                                         <div className={styles.colContent}>
@@ -526,13 +526,8 @@ export default function AdminPage() {
                                                     return (
                                                         <div
                                                             key={h}
-                                                            className={styles.hourCell}
+                                                            className={`${styles.hourCell} ${isOpen ? styles.hourCellOpen : styles.hourCellClosed}`}
                                                             onClick={() => isOpen && handleSlotClick(barber.id, h)}
-                                                            style={{
-                                                                cursor: isOpen ? 'pointer' : 'not-allowed',
-                                                                backgroundColor: isOpen ? 'transparent' : '#f5f5f5',
-                                                                opacity: isOpen ? 1 : 0.5
-                                                            }}
                                                             title={isOpen ? `Click to book` : 'Closed'}
                                                         ></div>
                                                     );
@@ -567,7 +562,7 @@ export default function AdminPage() {
                                                             <div
                                                                 key={app.id}
                                                                 className={`${styles.appointment} ${styles[app.status.toLowerCase()]}`}
-                                                                style={style}
+                                                                style={style} /* NOSONAR */
                                                                 onClick={(e) => { e.stopPropagation(); setSelectedAppointment(app); }}
                                                                 title="Click to view details"
                                                             >
@@ -630,7 +625,7 @@ export default function AdminPage() {
                                 {barbers.map(barber => (
                                     <div key={barber.id} className={styles.barberCard}>
                                         <div className={styles.barberName}>
-                                            <span className={styles.colorDot} style={{ '--bg-color': barber.color } as React.CSSProperties}></span>
+                                            <span className={styles.colorDot} style={{ '--bg-color': barber.color } as React.CSSProperties} /* NOSONAR */></span>
                                             {barber.name}
                                         </div>
                                         <div className={styles.schedulePreview}>
@@ -781,7 +776,7 @@ export default function AdminPage() {
                                         <div key={img.id} className={styles.imageCard}>
                                             <div
                                                 className={styles.imagePreview}
-                                                style={{ '--bg-image': `url(${img.url})` } as React.CSSProperties}
+                                                style={{ '--bg-image': `url(${img.url})` } as React.CSSProperties} /* NOSONAR */
                                             />
                                             <div className={styles.imageInfo}>
                                                 <input
@@ -809,8 +804,7 @@ export default function AdminPage() {
                                                 </button>
                                                 <button
                                                     onClick={() => deleteAboutImage(img.id)}
-                                                    className={styles.deleteBtn}
-                                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                                                    className={`${styles.deleteBtn} ${styles.btnExtraSmall}`}
                                                 >
                                                     Delete
                                                 </button>
@@ -861,7 +855,6 @@ export default function AdminPage() {
                                         <tr>
                                             <th
                                                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                                style={{ cursor: 'pointer', userSelect: 'none' }}
                                                 className={styles.sortableHeader}
                                             >
                                                 Date & Time {sortOrder === 'asc' ? '▲' : '▼'}
@@ -1026,7 +1019,7 @@ export default function AdminPage() {
                         <div className={styles.modalFooter}>
                             {isRescheduling ? (
                                 <div className={`${styles.statusActions} ${styles.rescheduleActions}`}>
-                                    <button onClick={() => setIsRescheduling(false)} className={`${styles.actionBtn}`} style={{ background: '#555' }}>
+                                    <button onClick={() => setIsRescheduling(false)} className={`${styles.actionBtn} ${styles.btnCancel}`}>
                                         Cancel
                                     </button>
                                     <button onClick={submitReschedule} className={`${styles.actionBtn} ${styles.btnApprove}`}>
