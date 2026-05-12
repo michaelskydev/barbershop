@@ -159,6 +159,7 @@ export default function AdminPage() {
         if (!confirm('Are you sure? This will delete all appointments for this barber.')) return;
         await fetch(`/api/barbers/${id}`, { method: 'DELETE' });
         fetchData();
+        console.log("testing")
     };
 
     // Manual Booking State
