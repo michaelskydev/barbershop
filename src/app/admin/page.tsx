@@ -194,6 +194,7 @@ export default function AdminPage() {
 
     const handleAboutInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setAboutInfo({ ...aboutInfo, [e.target.name]: e.target.value });
+        console.log(aboutInfo);
     };
 
     const saveAboutInfo = async () => {
