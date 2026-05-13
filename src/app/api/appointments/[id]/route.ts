@@ -12,7 +12,7 @@ export async function PATCH(
         const body = await request.json();
         const { status, startDate, barberId } = body;
 
-        const updateData: any = {};
+        const updateData: { status?: string; startDate?: string; barberId?: number } = {};
         if (status !== undefined) updateData.status = status;
         if (startDate !== undefined) updateData.startDate = startDate;
         if (barberId !== undefined) updateData.barberId = parseInt(barberId);

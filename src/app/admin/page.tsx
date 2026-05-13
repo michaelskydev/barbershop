@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { formatTime12h, formatValueTo12h } from '@/lib/utils';
 
-type Barber = { id: number; name: string; color: string; schedules: any[] };
+type Barber = { id: number; name: string; color: string; schedules: unknown[] };
 type Appointment = {
     id: number;
     startDate: string;
@@ -49,7 +49,7 @@ export default function AdminPage() {
     };
 
     const fetchHistory = async () => {
-        let url = `/api/appointments?status=${historyFilters.status}&barberId=${historyFilters.barberId}`;
+        const url = `/api/appointments?status=${historyFilters.status}&barberId=${historyFilters.barberId}`;
         const res = await fetch(url, { cache: 'no-store' });
         const data = await res.json();
         setHistoryAppointments(data);
@@ -124,7 +124,7 @@ export default function AdminPage() {
         fetchData();
     };
     const [editingSchedule, setEditingSchedule] = useState<Barber | null>(null);
-    const [schedule, setSchedule] = useState<any[]>([]);
+    const [schedule, setSchedule] = useState<unknown[]>([]);
 
     const openSchedule = async (barber: Barber) => {
         setEditingSchedule(barber);
@@ -133,13 +133,13 @@ export default function AdminPage() {
         // Ensure all days are present
         const fullSchedule = [];
         for (let i = 0; i <= 6; i++) { // Sun-Sat
-            const existing = data.find((s: any) => s.dayOfWeek === i);
+            const existing = data.find((s: { dayOfWeek: number }) => s.dayOfWeek === i);
             fullSchedule.push(existing || { dayOfWeek: i, startTime: '09:00', endTime: '17:00', active: false });
         }
         setSchedule(fullSchedule);
     };
 
-    const handleScheduleChange = (index: number, field: string, value: any) => {
+    const handleScheduleChange = (index: number, field: string, value: unknown) => {
         const newSchedule = [...schedule];
         newSchedule[index] = { ...newSchedule[index], [field]: value };
         setSchedule(newSchedule);
@@ -169,10 +169,10 @@ export default function AdminPage() {
     const [bookingCustomerName, setBookingCustomerName] = useState('');
     const [bookingCustomerEmail, setBookingCustomerEmail] = useState('');
     const [bookingCustomerPhone, setBookingCustomerPhone] = useState('');
-    const [services, setServices] = useState<any[]>([]);
+    const [services, setServices] = useState<unknown[]>([]);
 
     const [aboutInfo, setAboutInfo] = useState({ story: '', address: '', hours: '', mapsUrl: '' });
-    const [aboutImages, setAboutImages] = useState<any[]>([]);
+    const [aboutImages, setAboutImages] = useState<unknown[]>([]);
     const [isSavingAbout, setIsSavingAbout] = useState(false);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     const [savingImageId, setSavingImageId] = useState<number | null>(null);

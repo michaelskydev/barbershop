@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     const dayOfWeek = date.getUTCDay(); // 0-6 in UTC
 
     // 1. Get Barber Schedule for this day
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const schedule = await (prisma as any).schedule.findUnique({
         where: {
             barberId_dayOfWeek: {
@@ -32,10 +33,10 @@ export async function GET(request: Request) {
 
     // 2. Generate possible slots
     const slots = [];
-    let [startHour, startMin] = schedule.startTime.split(':').map(Number);
-    let [endHour, endMin] = schedule.endTime.split(':').map(Number);
+    const [startHour, startMin] = schedule.startTime.split(':').map(Number);
+    const [endHour, endMin] = schedule.endTime.split(':').map(Number);
 
-    let current = new Date(date);
+    const current = new Date(date);
     current.setUTCHours(startHour, startMin, 0, 0);
 
     const end = new Date(date);
