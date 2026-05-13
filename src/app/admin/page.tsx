@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { formatTime12h, formatValueTo12h } from '@/lib/utils';
 
-type Barber = { id: number; name: string; color: string; schedules: unknown[] };
+type Schedule = { dayOfWeek: number; startTime: string; endTime: string; active: boolean; };
+type Barber = { id: number; name: string; color: string; schedules: Schedule[] };
+type Service = { id: number; name: string; duration: number; price: number; };
 type Appointment = {
     id: number;
     startDate: string;
@@ -12,9 +14,10 @@ type Appointment = {
     customerName: string;
     customerEmail: string;
     customerPhone?: string;
-    service: { name: string; duration: number; price: number };
+    service: Service;
     barberId: number;
 };
+type AboutImage = { id: number; url: string; title: string; subtitle: string; order: number; };
 
 
 export default function AdminPage() {
@@ -124,7 +127,7 @@ export default function AdminPage() {
         fetchData();
     };
     const [editingSchedule, setEditingSchedule] = useState<Barber | null>(null);
-    const [schedule, setSchedule] = useState<unknown[]>([]);
+    const [schedule, setSchedule] = useState<Schedule[]>([]);
 
     const openSchedule = async (barber: Barber) => {
         setEditingSchedule(barber);
@@ -133,15 +136,16 @@ export default function AdminPage() {
         // Ensure all days are present
         const fullSchedule = [];
         for (let i = 0; i <= 6; i++) { // Sun-Sat
-            const existing = data.find((s: { dayOfWeek: number }) => s.dayOfWeek === i);
+            const existing = data.find((s: Schedule) => s.dayOfWeek === i);
             fullSchedule.push(existing || { dayOfWeek: i, startTime: '09:00', endTime: '17:00', active: false });
         }
         setSchedule(fullSchedule);
     };
 
-    const handleScheduleChange = (index: number, field: string, value: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleScheduleChange = (index: number, field: string, value: any) => {
         const newSchedule = [...schedule];
-        newSchedule[index] = { ...newSchedule[index], [field]: value };
+        newSchedule[index] = { ...newSchedule[index], [field]: value } as Schedule;
         setSchedule(newSchedule);
     };
 
@@ -169,10 +173,10 @@ export default function AdminPage() {
     const [bookingCustomerName, setBookingCustomerName] = useState('');
     const [bookingCustomerEmail, setBookingCustomerEmail] = useState('');
     const [bookingCustomerPhone, setBookingCustomerPhone] = useState('');
-    const [services, setServices] = useState<unknown[]>([]);
+    const [services, setServices] = useState<Service[]>([]);
 
     const [aboutInfo, setAboutInfo] = useState({ story: '', address: '', hours: '', mapsUrl: '' });
-    const [aboutImages, setAboutImages] = useState<unknown[]>([]);
+    const [aboutImages, setAboutImages] = useState<AboutImage[]>([]);
     const [isSavingAbout, setIsSavingAbout] = useState(false);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     const [savingImageId, setSavingImageId] = useState<number | null>(null);
