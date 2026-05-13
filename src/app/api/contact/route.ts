@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 export async function POST(request: Request) {
     try {
@@ -9,6 +10,11 @@ export async function POST(request: Request) {
 
         if (!name || !email || !message) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        if (!resend) {
+            console.log('Contact message received but no RESEND_API_KEY set:', { name, email, message });
+            return NextResponse.json({ success: true, dummy: true });
         }
 
         const data = await resend.emails.send({
