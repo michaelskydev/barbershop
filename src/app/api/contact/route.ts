@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+// import { Resend } from 'resend';
 
-const resendApiKey = process.env.RESEND_API_KEY;
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
+// const resendApiKey = process.env.RESEND_API_KEY;
+// const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 export async function POST(request: Request) {
     try {
@@ -12,20 +12,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        if (!resend) {
-            console.log('Contact message received but no RESEND_API_KEY set:', { name, email, message });
-            return NextResponse.json({ success: true, dummy: true });
-        }
-
-        const data = await resend.emails.send({
-            from: 'Gentlemen\'s Cut Contact <onboarding@resend.dev>',
-            to: [process.env.CONTACT_RECEIVER_EMAIL || 'your-email@example.com'],
-            subject: `New Message from ${name}`,
-            replyTo: email,
-            text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-        });
-
-        return NextResponse.json(data);
+        console.log('Contact message received (Resend paused):', { name, email, message });
+        return NextResponse.json({ success: true, dummy: true });
     } catch (error) {
         console.error('Contact form error:', error);
         return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
