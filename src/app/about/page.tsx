@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
+import Footer from '@/components/Footer';
 
 export default function AboutPage() {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -236,6 +237,7 @@ export default function AboutPage() {
 
                 </section>
             </main>
+            <Footer />
         </div>
     );
 }
