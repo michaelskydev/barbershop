@@ -22,9 +22,9 @@ export default function Home() {
             <Link href="/book" className={styles.ctaPrimary}>
               Book Appointment
             </Link>
-            <>
-            </>
+
           </div>
+          <p>&nbsp;</p>
         </div>
 
         <div className={styles.heroImages}>
