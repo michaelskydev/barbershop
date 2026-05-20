@@ -62,15 +62,15 @@
 }
 
 .heroImageWrapper:first-child {
-  width: 280px;
-  height: 380px;
-  transform: translateY(20px);
+  width: 360px;
+  height: 500px;
+  transform: translateY(30px);
 }
 
 .heroImageWrapper:last-child {
-  width: 320px;
-  height: 440px;
-  transform: translateY(-20px);
+  width: 420px;
+  height: 580px;
+  transform: translateY(-30px);
 }
 
 .heroImage {
