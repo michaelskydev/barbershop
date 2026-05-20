@@ -22,24 +22,26 @@ export default function Home() {
             <Link href="/book" className={styles.ctaPrimary}>
               Book Appointment
             </Link>
+            <>
+            </>
           </div>
         </div>
 
         <div className={styles.heroImages}>
           <div className={styles.heroImageWrapper}>
-            <Image 
-              src="/images/splitt-action.png" 
-              alt="Edgy barber cutting hair" 
-              fill 
-              className={styles.heroImage} 
+            <Image
+              src="/images/splitt-action.png"
+              alt="Edgy barber cutting hair"
+              fill
+              className={styles.heroImage}
             />
           </div>
           <div className={styles.heroImageWrapper}>
-            <Image 
-              src="/images/splitt-interior.png" 
-              alt="Modern dark barbershop interior" 
-              fill 
-              className={styles.heroImage} 
+            <Image
+              src="/images/splitt-interior.png"
+              alt="Modern dark barbershop interior"
+              fill
+              className={styles.heroImage}
             />
           </div>
         </div>
