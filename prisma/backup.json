@@ -1,0 +1,342 @@
+{
+  "barber": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "color": "#FF5733"
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "color": "#33FF57"
+    },
+    {
+      "id": 3,
+      "name": "James Brown",
+      "color": "#5f2fd0"
+    }
+  ],
+  "service": [
+    {
+      "id": 1,
+      "name": "Haircut",
+      "duration": 30,
+      "price": 25
+    },
+    {
+      "id": 2,
+      "name": "Beard Trim",
+      "duration": 15,
+      "price": 15
+    },
+    {
+      "id": 3,
+      "name": "Haircut + Beard Trim",
+      "duration": 60,
+      "price": 35
+    }
+  ],
+  "appointment": [
+    {
+      "id": 76,
+      "customerName": "test",
+      "customerEmail": "testing@gmail.com",
+      "customerPhone": null,
+      "startDate": "2026-02-09T13:00:00.000Z",
+      "status": "APPROVED",
+      "barberId": 1,
+      "serviceId": 1
+    },
+    {
+      "id": 77,
+      "customerName": "Michael",
+      "customerEmail": "michaelsky0000@gmail.com",
+      "customerPhone": null,
+      "startDate": "2026-02-09T14:00:00.000Z",
+      "status": "APPROVED",
+      "barberId": 1,
+      "serviceId": 1
+    },
+    {
+      "id": 78,
+      "customerName": "Michael",
+      "customerEmail": "michaelsky0000@gmail.com",
+      "customerPhone": null,
+      "startDate": "2026-02-10T13:00:00.000Z",
+      "status": "PENDING",
+      "barberId": 1,
+      "serviceId": 1
+    },
+    {
+      "id": 79,
+      "customerName": "mike",
+      "customerEmail": "mike@nshome.com",
+      "customerPhone": null,
+      "startDate": "2026-03-06T13:00:00.000Z",
+      "status": "PENDING",
+      "barberId": 2,
+      "serviceId": 1
+    },
+    {
+      "id": 80,
+      "customerName": "Michael",
+      "customerEmail": "michaelsky0000@gmail.com",
+      "customerPhone": "9023885949",
+      "startDate": "2026-03-10T12:00:00.000Z",
+      "status": "APPROVED",
+      "barberId": 1,
+      "serviceId": 1
+    },
+    {
+      "id": 81,
+      "customerName": "James",
+      "customerEmail": "michaelskydev@gmail.com",
+      "customerPhone": "9023885949",
+      "startDate": "2026-03-10T13:00:00.000Z",
+      "status": "APPROVED",
+      "barberId": 2,
+      "serviceId": 1
+    },
+    {
+      "id": 82,
+      "customerName": "Michael Sky (Test)",
+      "customerEmail": "michaelskydev@gmail.com",
+      "customerPhone": "555-0101",
+      "startDate": "2026-03-11T10:00:00.000Z",
+      "status": "APPROVED",
+      "barberId": 1,
+      "serviceId": 1
+    },
+    {
+      "id": 83,
+      "customerName": "Michael",
+      "customerEmail": "michaelsky0000@gmail.com",
+      "customerPhone": null,
+      "startDate": "2026-03-10T12:30:00.000Z",
+      "status": "APPROVED",
+      "barberId": 3,
+      "serviceId": 3
+    },
+    {
+      "id": 84,
+      "customerName": "Michael Sky (Test)",
+      "customerEmail": "michaelskydev@gmail.com",
+      "customerPhone": "555-0101",
+      "startDate": "2026-03-11T10:00:00.000Z",
+      "status": "APPROVED",
+      "barberId": 1,
+      "serviceId": 1
+    },
+    {
+      "id": 85,
+      "customerName": "Michael",
+      "customerEmail": "michaelskydev@gmail.com",
+      "customerPhone": null,
+      "startDate": "2026-03-12T14:30:00.000Z",
+      "status": "APPROVED",
+      "barberId": 3,
+      "serviceId": 3
+    },
+    {
+      "id": 86,
+      "customerName": "Michael",
+      "customerEmail": "michaelskydev@gmail.com",
+      "customerPhone": null,
+      "startDate": "2026-03-30T11:30:00.000Z",
+      "status": "APPROVED",
+      "barberId": 1,
+      "serviceId": 1
+    },
+    {
+      "id": 87,
+      "customerName": "Test User",
+      "customerEmail": "test@example.com",
+      "customerPhone": "12345678",
+      "startDate": "2026-05-20T01:27:13.820Z",
+      "status": "PENDING",
+      "barberId": 1,
+      "serviceId": 1
+    }
+  ],
+  "admin": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "password123"
+    }
+  ],
+  "schedule": [
+    {
+      "id": 1,
+      "dayOfWeek": 1,
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 1
+    },
+    {
+      "id": 2,
+      "dayOfWeek": 2,
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 1
+    },
+    {
+      "id": 3,
+      "dayOfWeek": 3,
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 1
+    },
+    {
+      "id": 4,
+      "dayOfWeek": 4,
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 1
+    },
+    {
+      "id": 5,
+      "dayOfWeek": 5,
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 1
+    },
+    {
+      "id": 6,
+      "dayOfWeek": 2,
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "active": true,
+      "barberId": 2
+    },
+    {
+      "id": 7,
+      "dayOfWeek": 3,
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "active": true,
+      "barberId": 2
+    },
+    {
+      "id": 8,
+      "dayOfWeek": 4,
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "active": true,
+      "barberId": 2
+    },
+    {
+      "id": 9,
+      "dayOfWeek": 5,
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "active": true,
+      "barberId": 2
+    },
+    {
+      "id": 10,
+      "dayOfWeek": 6,
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "active": true,
+      "barberId": 2
+    },
+    {
+      "id": 11,
+      "dayOfWeek": 1,
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 3
+    },
+    {
+      "id": 12,
+      "dayOfWeek": 2,
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 3
+    },
+    {
+      "id": 13,
+      "dayOfWeek": 3,
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 3
+    },
+    {
+      "id": 14,
+      "dayOfWeek": 4,
+      "startTime": "12:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 3
+    },
+    {
+      "id": 15,
+      "dayOfWeek": 5,
+      "startTime": "13:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 3
+    },
+    {
+      "id": 21,
+      "dayOfWeek": 6,
+      "startTime": "16:00",
+      "endTime": "17:00",
+      "active": true,
+      "barberId": 3
+    }
+  ],
+  "aboutInfo": [
+    {
+      "id": 1,
+      "story": "Splittends.ca has been serving the Halifax community since 1986. With over three decades of experience, we pride ourselves on providing top-notch hairstyling and grooming services.",
+      "address": "1030 South Park St, \nHalifax, NS B3H 2W3",
+      "hours": "Mon - Fri: 10 AM - 10 PM\nSat: 10 AM - 10 PM\nSun: 11 AM - 4 PM",
+      "mapsUrl": "https://www.google.com/maps/place/1030+South+Park+St,+Halifax,+NS+B3H+2W3/@44.6352497,-63.576877,16z/data=!3m1!4b1!4m6!3m5!1s0x4b5a23290b731635:0xe313f5b634f7df0!8m2!3d44.6352497!4d-63.576877!16s%2Fg%2F11s8xrckvg?entry=ttu&g_ep=EgoyMDI2MDQxNS4wIKXMDSoASAFQAw%3D%3D",
+      "updatedAt": "2026-04-20T20:17:25.363Z"
+    }
+  ],
+  "aboutImage": [
+    {
+      "id": 1,
+      "url": "/images/about-1.png",
+      "title": "Premium Atmosphere",
+      "subtitle": "Experience grooming in a space designed for the modern gentleman.",
+      "order": 0,
+      "createdAt": "2026-02-05T19:08:28.857Z"
+    },
+    {
+      "id": 2,
+      "url": "/images/about-2.png",
+      "title": "Master Craftsmanship",
+      "subtitle": "Our tools are as sharp as our skills, ensuring perfection in every cut.",
+      "order": 1,
+      "createdAt": "2026-02-05T19:08:28.857Z"
+    },
+    {
+      "id": 3,
+      "url": "/images/about-3.png",
+      "title": "Dedicated Attention",
+      "subtitle": "Every client is unique. Every style is a masterpiece.",
+      "order": 2,
+      "createdAt": "2026-02-05T19:08:28.857Z"
+    },
+    {
+      "id": 6,
+      "url": "/uploads/1776716957050-300520831_478143590985813_9222946559822802426_n.jpg",
+      "title": "Splitt Ends",
+      "subtitle": "logo",
+      "order": 3,
+      "createdAt": "2026-04-20T20:29:17.075Z"
+    }
+  ]
+}

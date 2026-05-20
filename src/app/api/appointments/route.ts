@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const date = searchParams.get('date')
     const status = searchParams.get('status')
 
-    const where: any = {}
+    const where: { barberId?: number; status?: string; startDate?: { gte: Date; lte: Date } } = {}
     if (barberId) where.barberId = parseInt(barberId)
     if (status) where.status = status
     if (date) {
@@ -67,7 +67,15 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Barber not found' }, { status: 400 });
         }
 
-        const appointmentData: any = {
+        const appointmentData: {
+            customerName: string;
+            customerEmail: string;
+            customerPhone: string | null;
+            startDate: Date;
+            status: string;
+            barberId: number;
+            serviceId: number;
+        } = {
             customerName,
             customerEmail,
             customerPhone: customerPhone || null,
@@ -113,11 +121,11 @@ export async function POST(request: Request) {
         });
 
         return NextResponse.json(appointment)
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating appointment:', error)
         return NextResponse.json({
             error: 'Failed to create appointment',
-            details: error.message
+            details: (error as Error).message
         }, { status: 500 })
     }
 }
