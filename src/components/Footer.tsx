@@ -44,7 +44,7 @@ export default function Footer() {
             <div className={styles.brand}>
               <span className={styles.brandAccent}>SPLITT</span> ENDS
             </div>
-            <p className={styles.tagline}>Stylist & Barber since 1986</p>
+            <p className={styles.tagline}>Barbershop since 1986</p>
             <p className={styles.description}>
               Halifax&apos;s premier grooming studio. We blend classic barbering techniques with modern styling to craft confidence for every client.
             </p>

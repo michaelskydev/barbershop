@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <div className={styles.logo}>SPLITT ENDS - Stylist & Barber</div>
+        <div className={styles.logo}>SPLITT ENDS Barbershop - Stylist & Barber</div>
         <nav className={styles.nav}>
           <Link href="/about" className={styles.link}>About Us</Link>
           <Link href="/admin" className={styles.link}>Admin</Link>

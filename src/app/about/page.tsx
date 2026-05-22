@@ -13,7 +13,7 @@ export default function AboutPage() {
         hours: 'Loading...',
         mapsUrl: ''
     });
-    const [images, setImages] = useState<{url: string, title?: string, subtitle?: string}[]>([]);
+    const [images, setImages] = useState<{ url: string, title?: string, subtitle?: string }[]>([]);
     const [loading, setLoading] = useState(true);
     const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
     const [formData, setFormData] = useState({
@@ -91,7 +91,7 @@ export default function AboutPage() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>SPLITT ENDS - Stylist & Barber</Link>
+                <Link href="/" className={styles.logo}>SPLITT ENDS Barbershop- Stylist & Barber</Link>
                 <nav className={styles.nav}>
                     <Link href="/" className={styles.link}>Home</Link>
                     <Link href="/book" className={styles.link}>Book Now</Link>
@@ -124,7 +124,7 @@ export default function AboutPage() {
                     <div className={styles.story}>
                         <h2>Crafting Confidence</h2>
                         <p>
-                            At Splitt Ends, we believe that a great haircut is more than just a service, it is an investment in yourself.
+                            At Splitt Ends Barbershop, we believe that a great haircut is more than just a service, it is an investment in yourself.
                             Our team of master barbers is dedicated to helping you look and feel your absolute best.
                         </p>
                         <p>From classic fades to modern styling, we take the time to understand your unique needs and preferences,
