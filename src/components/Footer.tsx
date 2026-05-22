@@ -153,7 +153,7 @@ export default function Footer() {
       <div className={styles.bottomBar}>
         <div className={styles.bottomContainer}>
           <p className={styles.copyright}>
-            &copy; {new Date().getFullYear()} <span className={styles.brandAccent}>Splitt Ends</span>. All rights reserved.
+            &copy; {new Date().getFullYear()} <span className={styles.brandAccent}>Splitt Ends Barbershop</span>. All rights reserved.
           </p>
           <div className={styles.legalLinks}>
             <Link href="/about" className={styles.legalLink}>Privacy Policy</Link>

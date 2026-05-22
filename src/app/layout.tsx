@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Splitt Ends barbershop- Stylist & Barber",
+  title: "Splitt Ends Barbershop",
   description: "Halifax's premium barbershop and styling studio serving the community since 1986.",
 };
 
