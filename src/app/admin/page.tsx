@@ -5,7 +5,7 @@ import styles from './page.module.css';
 import { formatTime12h, formatValueTo12h } from '@/lib/utils';
 
 type Schedule = { dayOfWeek: number; startTime: string; endTime: string; active: boolean; };
-type Barber = { id: number; name: string; color: string; schedules: Schedule[] };
+type Barber = { id: number; name: string; color: string; imageUrl?: string | null; schedules: Schedule[] };
 type Service = { id: number; name: string; duration: number; price: number; };
 type Appointment = {
     id: number;
@@ -115,6 +115,69 @@ export default function AdminPage() {
 
     const [newBarberName, setNewBarberName] = useState('');
     const [newBarberColor, setNewBarberColor] = useState('#000000');
+
+    // Editing Barber States
+    const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
+    const [editBarberName, setEditBarberName] = useState('');
+    const [editBarberColor, setEditBarberColor] = useState('#000000');
+    const [editBarberImageUrl, setEditBarberImageUrl] = useState('');
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+    const openEditBarber = (barber: Barber) => {
+        setEditingBarber(barber);
+        setEditBarberName(barber.name);
+        setEditBarberColor(barber.color);
+        setEditBarberImageUrl(barber.imageUrl || '');
+    };
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploadingAvatar(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.url) {
+                setEditBarberImageUrl(data.url);
+            }
+        } catch (error) {
+            console.error('Avatar upload failed:', error);
+            alert('Failed to upload avatar.');
+        } finally {
+            setIsUploadingAvatar(false);
+        }
+    };
+
+    const saveBarberDetails = async () => {
+        if (!editingBarber) return;
+        try {
+            const res = await fetch(`/api/barbers/${editingBarber.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: editBarberName,
+                    color: editBarberColor,
+                    imageUrl: editBarberImageUrl || null
+                })
+            });
+            if (res.ok) {
+                setEditingBarber(null);
+                fetchData();
+            } else {
+                alert('Failed to save barber details.');
+            }
+        } catch (error) {
+            console.error('Failed to save barber details:', error);
+            alert('Failed to save barber details.');
+        }
+    };
 
     const addBarber = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -489,6 +552,77 @@ export default function AdminPage() {
                 </div>
             )}
 
+            {editingBarber && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modal}>
+                        <h2>Edit Barber: {editingBarber.name}</h2>
+                        
+                        <div className={styles.formGroup}>
+                            <div className={styles.avatarEditContainer}>
+                                <div 
+                                    className={styles.avatarPreview} 
+                                    style={{ 
+                                        backgroundColor: editBarberColor,
+                                        backgroundImage: editBarberImageUrl ? `url(${editBarberImageUrl})` : 'none',
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                        color: '#1a1a1a'
+                                    }}
+                                >
+                                    {!editBarberImageUrl && editBarberName ? editBarberName[0] : ''}
+                                </div>
+                                <button 
+                                    type="button" 
+                                    className={styles.smallBtn}
+                                    onClick={() => document.getElementById('avatarUploadInput')?.click()}
+                                    disabled={isUploadingAvatar}
+                                >
+                                    {isUploadingAvatar ? 'Uploading...' : 'Upload Avatar'}
+                                </button>
+                                <input
+                                    id="avatarUploadInput"
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    title="Avatar Upload Input"
+                                    placeholder="Avatar Upload Input"
+                                    onChange={handleAvatarUpload}
+                                />
+                                {editBarberImageUrl && (
+                                    <button 
+                                        type="button" 
+                                        className={styles.deleteBtn}
+                                        onClick={() => setEditBarberImageUrl('')}
+                                    >
+                                        Remove Avatar
+                                    </button>
+                                )}
+                            </div>
+
+                            <label>Name</label>
+                            <input
+                                className={styles.input}
+                                value={editBarberName}
+                                onChange={e => setEditBarberName(e.target.value)}
+                            />
+
+                            <label>Color</label>
+                            <input
+                                type="color"
+                                className={styles.colorParams}
+                                value={editBarberColor}
+                                onChange={e => setEditBarberColor(e.target.value)}
+                            />
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button onClick={saveBarberDetails} className={styles.button}>Save Details</button>
+                            <button onClick={() => setEditingBarber(null)} className={styles.smallBtn}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {loading ? <div>Loading...</div> : (
                 <>
                     {tab === 'calendar' && (
@@ -630,11 +764,22 @@ export default function AdminPage() {
                                 {barbers.map(barber => (
                                     <div key={barber.id} className={styles.barberCard}>
                                         <div className={styles.barberName}>
-                                            <span className={styles.colorDot} style={{ '--bg-color': barber.color } as React.CSSProperties} /* NOSONAR */></span>
+                                            {barber.imageUrl ? (
+                                                <span 
+                                                    className={styles.avatarDot} 
+                                                    style={{ backgroundImage: `url(${barber.imageUrl})` }}
+                                                ></span>
+                                            ) : (
+                                                <span 
+                                                    className={styles.colorDot} 
+                                                    style={{ '--bg-color': barber.color } as React.CSSProperties} /* NOSONAR */
+                                                ></span>
+                                            )}
                                             {barber.name}
                                         </div>
                                         <div className={styles.schedulePreview}>
-                                            <button onClick={() => openSchedule(barber)} className={styles.smallBtn}>Edit Schedule</button>
+                                            <button onClick={() => openEditBarber(barber)} className={styles.smallBtn}>Edit Details</button>
+                                            <button onClick={() => openSchedule(barber)} className={`${styles.smallBtn} ${styles.ml05}`}>Edit Schedule</button>
                                             <button onClick={() => deleteBarber(barber.id)} className={`${styles.deleteBtn} ${styles.ml05}`}>Delete</button>
                                         </div>
                                     </div>

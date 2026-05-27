@@ -12,6 +12,7 @@ model Barber {
   id           Int           @id @default(autoincrement())
   name         String
   color        String
+  imageUrl     String?
   appointments Appointment[]
   schedules    Schedule[]
 }

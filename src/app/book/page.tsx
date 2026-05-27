@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { formatTime12h } from '@/lib/utils';
 import Calendar from './Calendar';
 
-type Barber = { id: number; name: string; color: string };
+type Barber = { id: number; name: string; color: string; imageUrl?: string | null };
 type Service = { id: number; name: string; duration: number; price: number };
 
 export default function BookPage() {
@@ -131,7 +131,12 @@ export default function BookPage() {
                                     onClick={() => setSelectedBarber(barber)}
                                 >
                                     <div className={styles.avatar} style={{ '--avatar-bg': barber.color } as React.CSSProperties} /* NOSONAR */>
-                                        {barber.name[0]}
+                                        {barber.imageUrl ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={barber.imageUrl} alt={barber.name} className={styles.avatarImg} />
+                                        ) : (
+                                            barber.name[0]
+                                        )}
                                     </div>
                                     <h3>{barber.name}</h3>
                                 </div>

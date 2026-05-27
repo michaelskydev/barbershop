@@ -1,6 +1,16 @@
 import { PrismaClient } from '@prisma/client'
+import crypto from 'crypto'
 
 const prisma = new PrismaClient()
+
+function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const iterations = 10000;
+  const keylen = 64;
+  const digest = 'sha512';
+  const hash = crypto.pbkdf2Sync(password, salt, iterations, keylen, digest).toString('hex');
+  return `pbkdf2$${iterations}$${salt}$${hash}`;
+}
 
 async function main() {
   // Create Barbers
@@ -43,13 +53,15 @@ async function main() {
     },
   })
 
-  // Create Admin
+  // Create Admin with securely hashed password
   await prisma.admin.upsert({
     where: { username: 'admin' },
-    update: {},
+    update: {
+      password: hashPassword('password123')
+    },
     create: {
       username: 'admin',
-      password: 'password123', // In real app, hash this
+      password: hashPassword('password123'),
     },
   })
 

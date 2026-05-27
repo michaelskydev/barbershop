@@ -11,10 +11,10 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, color } = body
+        const { name, color, imageUrl } = body
 
         const barber = await prisma.barber.create({
-            data: { name, color }
+            data: { name, color, imageUrl }
         })
 
         // Create default schedule (Mon-Fri 9-5)
