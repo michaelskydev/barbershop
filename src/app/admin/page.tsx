@@ -36,6 +36,49 @@ export default function AdminPage() {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [isRescheduling, setIsRescheduling] = useState(false);
     const [rescheduleData, setRescheduleData] = useState({ date: '', time: '', barberId: '' });
+    
+    // Admin Password Change States
+    const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [passwordSuccess, setPasswordSuccess] = useState('');
+    const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setPasswordError('');
+        setPasswordSuccess('');
+        
+        if (!newPassword || newPassword.trim().length < 4) {
+            setPasswordError('Password must be at least 4 characters long.');
+            return;
+        }
+
+        setIsSavingPassword(true);
+        try {
+            const res = await fetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ newPassword })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setPasswordSuccess('Password changed successfully!');
+                setNewPassword('');
+                setTimeout(() => {
+                    setPasswordModalOpen(false);
+                    setPasswordSuccess('');
+                }, 2000);
+            } else {
+                setPasswordError(data.error || 'Failed to change password.');
+            }
+        } catch (err) {
+            console.error(err);
+            setPasswordError('An error occurred. Please try again.');
+        } finally {
+            setIsSavingPassword(false);
+        }
+    };
 
     const fetchData = async () => {
         setLoading(true);
@@ -406,7 +449,10 @@ export default function AdminPage() {
             <header className={styles.header}>
                 <div className={styles.headerTop}>
                     <h1>Admin Dashboard</h1>
-                    <button onClick={handleLogout} className={styles.logoutBtn}>Sign Out</button>
+                    <div className={styles.headerButtons}>
+                        <button onClick={() => setPasswordModalOpen(true)} className={styles.passwordBtn}>Change Password</button>
+                        <button onClick={handleLogout} className={styles.logoutBtn}>Sign Out</button>
+                    </div>
                 </div>
                 <div className={styles.controls}>
                     <button
@@ -548,6 +594,36 @@ export default function AdminPage() {
                             <button onClick={saveSchedule} className={styles.button}>Save Changes</button>
                             <button onClick={() => setEditingSchedule(null)} className={styles.smallBtn}>Cancel</button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {passwordModalOpen && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modal}>
+                        <h2>Change Password</h2>
+                        <form onSubmit={handlePasswordChange}>
+                            <div className={styles.formGroup}>
+                                <label>New Password</label>
+                                <input
+                                    type="password"
+                                    className={styles.input}
+                                    placeholder="Enter new password"
+                                    value={newPassword}
+                                    onChange={e => setNewPassword(e.target.value)}
+                                    required
+                                    minLength={4}
+                                />
+                                {passwordError && <p className={styles.errorText}>{passwordError}</p>}
+                                {passwordSuccess && <p className={styles.successText}>{passwordSuccess}</p>}
+                            </div>
+                            <div className={styles.modalActions}>
+                                <button type="submit" className={styles.button} disabled={isSavingPassword}>
+                                    {isSavingPassword ? 'Saving...' : 'Save Password'}
+                                </button>
+                                <button type="button" onClick={() => { setPasswordModalOpen(false); setNewPassword(''); setPasswordError(''); }} className={styles.smallBtn}>Cancel</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

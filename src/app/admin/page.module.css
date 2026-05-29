@@ -491,6 +491,40 @@
     border-color: #fff;
 }
 
+.headerButtons {
+    display: flex;
+    gap: 1rem;
+}
+
+.passwordBtn {
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.passwordBtn:hover {
+    background: var(--primary);
+    color: #1a1a1a;
+}
+
+.errorText {
+    color: #e57373;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.successText {
+    color: #81c784;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
 /* Polished Modal Styles */
 .modalHeader {
     display: flex;
