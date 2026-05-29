@@ -4,7 +4,7 @@ import { Resend } from 'resend';
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
-const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL || 'splittendssalon@gmail.com';
+const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL || 'splittend2018@gmail.com';
 
 export async function POST(request: Request) {
     try {
