@@ -40,11 +40,29 @@ export async function PATCH(
                 to: appointment.customerEmail,
                 subject: 'Booking Confirmed!',
                 html: `
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <h1 style="color: #d4af37; font-family: 'Georgia', serif; font-size: 2.2rem; margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Splitt Ends</h1>
+                        <p style="color: #888; font-size: 0.9rem; text-transform: uppercase; margin: 0.25rem 0 0 0;">Stylist & Barber</p>
+                    </div>
+
                     <h2>Great news, ${appointment.customerName}!</h2>
-                    <p>Your appointment for a <strong>${appointment.service.name}</strong> with <strong>${appointment.barber.name}</strong> has been confirmed.</p>
-                    <p><strong>Date & Time:</strong> ${formattedDate}</p>
-                    ${shopLocationHtml}
-                    <p>We've attached a calendar invite so you don't forget. See you soon!</p>
+                    <p>Your appointment has been confirmed. Here are your booking details:</p>
+                    
+                    <div style="background-color: #1a1a1a; padding: 1.5rem; border-radius: 8px; color: #ffffff; border: 1px solid #333; margin: 1.5rem 0;">
+                        <p style="margin: 0 0 0.5rem 0;"><strong>Event:</strong> ${appointment.service.name} with ${appointment.barber.name}</p>
+                        <p style="margin: 0 0 0.5rem 0;"><strong>Requested Date & Time:</strong> ${formattedDate}</p>
+                        ${aboutInfo ? `<p style="margin: 0 0 0.5rem 0;"><strong>Location:</strong> <a href="${aboutInfo.mapsUrl}" style="color: #d4af37; text-decoration: underline;">${aboutInfo.address}</a></p>` : ''}
+                        <p style="margin: 0;"><strong>Contact Phone:</strong> <a href="tel:9024298360" style="color: #d4af37; text-decoration: underline;">(902) 429-8360</a></p>
+                    </div>
+
+                    <p style="background: rgba(212, 175, 55, 0.1); border-left: 4px solid #d4af37; padding: 1rem; color: #d4af37; font-weight: bold; border-radius: 4px;">
+                        ⏰ Please arrive a few minutes before your scheduled time so we can start promptly.
+                    </p>
+
+                    <p>We've attached a calendar invite (.ics) to this email so you can easily add it to your calendar.</p>
+                    <br />
+                    <p>See you soon,</p>
+                    <p><strong>The Splittends Team</strong></p>
                 `,
                 icsString
             });
@@ -53,6 +71,10 @@ export async function PATCH(
                 to: appointment.customerEmail,
                 subject: 'Booking Update',
                 html: `
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <h1 style="color: #d4af37; font-family: 'Georgia', serif; font-size: 2.2rem; margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Splitt Ends</h1>
+                        <p style="color: #888; font-size: 0.9rem; text-transform: uppercase; margin: 0.25rem 0 0 0;">Stylist & Barber</p>
+                    </div>
                     <h2>Hello ${appointment.customerName},</h2>
                     <p>Unfortunately, we cannot accommodate your appointment request for a <strong>${appointment.service.name}</strong> on ${formattedDate}.</p>
                     <p>Please visit our site to book a different time.</p>
@@ -65,13 +87,29 @@ export async function PATCH(
                 to: appointment.customerEmail,
                 subject: 'Your Booking was Rescheduled',
                 html: `
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <h1 style="color: #d4af37; font-family: 'Georgia', serif; font-size: 2.2rem; margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Splitt Ends</h1>
+                        <p style="color: #888; font-size: 0.9rem; text-transform: uppercase; margin: 0.25rem 0 0 0;">Stylist & Barber</p>
+                    </div>
+
                     <h2>Hello ${appointment.customerName},</h2>
-                    <p>Your appointment has been updated by the barbershop.</p>
-                    <p><strong>New Service:</strong> ${appointment.service.name}<br/>
-                    <strong>New Barber:</strong> ${appointment.barber.name}<br/>
-                    <strong>New Date & Time:</strong> ${formattedDate}</p>
-                    ${shopLocationHtml}
-                    <p>We've attached an updated calendar invite. If this time doesn't work for you, please contact us.</p>
+                    <p>Your appointment has been updated by the barbershop. Here are your new booking details:</p>
+
+                    <div style="background-color: #1a1a1a; padding: 1.5rem; border-radius: 8px; color: #ffffff; border: 1px solid #333; margin: 1.5rem 0;">
+                        <p style="margin: 0 0 0.5rem 0;"><strong>Event:</strong> ${appointment.service.name} with ${appointment.barber.name}</p>
+                        <p style="margin: 0 0 0.5rem 0;"><strong>Requested Date & Time:</strong> ${formattedDate}</p>
+                        ${aboutInfo ? `<p style="margin: 0 0 0.5rem 0;"><strong>Location:</strong> <a href="${aboutInfo.mapsUrl}" style="color: #d4af37; text-decoration: underline;">${aboutInfo.address}</a></p>` : ''}
+                        <p style="margin: 0;"><strong>Contact Phone:</strong> <a href="tel:9024298360" style="color: #d4af37; text-decoration: underline;">(902) 429-8360</a></p>
+                    </div>
+
+                    <p style="background: rgba(212, 175, 55, 0.1); border-left: 4px solid #d4af37; padding: 1rem; color: #d4af37; font-weight: bold; border-radius: 4px;">
+                        ⏰ Please arrive a few minutes before your scheduled time so we can start promptly.
+                    </p>
+
+                    <p>We've attached an updated calendar invite (.ics). If this new time doesn't work for you, please let us know.</p>
+                    <br />
+                    <p>See you soon,</p>
+                    <p><strong>The Splittends Team</strong></p>
                 `,
                 icsString
             });

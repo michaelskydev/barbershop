@@ -109,14 +109,28 @@ export async function POST(request: Request) {
             to: customerEmail,
             subject: 'We received your booking request!',
             html: `
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h1 style="color: #d4af37; font-family: 'Georgia', serif; font-size: 2.2rem; margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Splitt Ends</h1>
+                    <p style="color: #888; font-size: 0.9rem; text-transform: uppercase; margin: 0.25rem 0 0 0;">Stylist & Barber</p>
+                </div>
+
                 <h2>Hello ${customerName},</h2>
-                <p>We've received your appointment request for a <strong>${service.name}</strong> with <strong>${barber.name}</strong>.</p>
-                <p><strong>Requested Date & Time:</strong> ${formattedDate}</p>
-                ${shopLocationHtml}
-                <br/>
-                <p>Please note: This is just a request. You will receive another email shortly once your barber confirms the appointment.</p>
-                <br/>
-                <p>See you soon,<br>The Barbershop Team</p>
+                <p>We've received your appointment request. Here are the requested booking details:</p>
+                
+                <div style="background-color: #1a1a1a; padding: 1.5rem; border-radius: 8px; color: #ffffff; border: 1px solid #333; margin: 1.5rem 0;">
+                    <p style="margin: 0 0 0.5rem 0;"><strong>Event:</strong> ${service.name} with ${barber.name}</p>
+                    <p style="margin: 0 0 0.5rem 0;"><strong>Requested Date & Time:</strong> ${formattedDate}</p>
+                    ${aboutInfo ? `<p style="margin: 0 0 0.5rem 0;"><strong>Location:</strong> <a href="${aboutInfo.mapsUrl}" style="color: #d4af37; text-decoration: underline;">${aboutInfo.address}</a></p>` : ''}
+                    <p style="margin: 0;"><strong>Contact Phone:</strong> <a href="tel:9024298360" style="color: #d4af37; text-decoration: underline;">(902) 429-8360</a></p>
+                </div>
+
+                <p style="background: rgba(212, 175, 55, 0.05); border-left: 4px solid #888; padding: 1rem; color: #aaa; font-style: italic; border-radius: 4px;">
+                    ⚠️ Please note: This is just a request. You will receive another email shortly once our team confirms your appointment slot.
+                </p>
+
+                <br />
+                <p>See you soon,</p>
+                <p><strong>The Splittends Team</strong></p>
             `
         });
 
