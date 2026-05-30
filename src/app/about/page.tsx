@@ -229,7 +229,7 @@ export default function AboutPage() {
                                 <a href="tel:9024298360" className={styles.contactLink}>(902) 429-8360</a>
                             </p>
                             <p>
-                                <a href="mailto:splittendssalon@gmail.com" className={styles.contactLink}>Send Email</a>
+                                <a href="mailto:splittend2018@gmail.com" className={styles.contactLink}>Send Email</a>
 
                             </p>
                         </div>
