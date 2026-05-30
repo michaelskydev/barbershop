@@ -131,8 +131,8 @@
     align-items: center;
     justify-content: center;
     border-bottom: 1px solid #333;
-    border-top: 4px solid transparent;
-    /* Colored by JS */
+    border-top: 4px solid var(--border-top-color, transparent);
+    /* Colored by JS via --border-top-color */
     font-weight: 700;
     background: rgba(255, 255, 255, 0.05);
 }
@@ -165,6 +165,8 @@
     position: absolute;
     left: 5px;
     right: 5px;
+    top: var(--app-top, 0);
+    height: var(--app-height, auto);
     background: var(--primary);
     color: #1a1a1a;
     border-radius: 4px;
@@ -175,6 +177,14 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
+}
+
+.rejectedSmall {
+    width: 30%;
+    left: auto;
+    right: 0;
+    opacity: 0.7;
+    z-index: 5;
 }
 
 .appointment.pending {
@@ -357,6 +367,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
+    background-color: var(--bg-color, #888);
 }
 
 .smallBtn {
@@ -853,6 +864,7 @@
 .imagePreview {
     width: 100%;
     height: 150px;
+    background-image: var(--bg-image);
     background-size: cover;
     background-position: center;
 }
@@ -1023,6 +1035,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
+    background-image: var(--avatar-image);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -1050,6 +1063,8 @@
     font-size: 2rem;
     font-weight: bold;
     color: #1a1a1a;
+    background-color: var(--avatar-bg, #888);
+    background-image: var(--avatar-image, none);
     background-size: cover;
     background-position: center;
     border: 3px solid var(--primary);

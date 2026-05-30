@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styles from './page.module.css';
 import { formatTime12h, formatValueTo12h } from '@/lib/utils';
 
@@ -80,7 +80,7 @@ export default function AdminPage() {
         }
     };
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         const [barbersRes, appointmentsRes] = await Promise.all([
             fetch('/api/barbers', { cache: 'no-store' }),
@@ -92,24 +92,24 @@ export default function AdminPage() {
         setBarbers(barbersData);
         setAppointments(appointmentsData);
         setLoading(false);
-    };
+    }, [date]);
 
-    const fetchHistory = async () => {
+    const fetchHistory = useCallback(async () => {
         const url = `/api/appointments?status=${historyFilters.status}&barberId=${historyFilters.barberId}`;
         const res = await fetch(url, { cache: 'no-store' });
         const data = await res.json();
         setHistoryAppointments(data);
-    };
+    }, [historyFilters.status, historyFilters.barberId]);
 
     useEffect(() => {
         if (tab === 'history') {
             fetchHistory();
         }
-    }, [tab, historyFilters.barberId, historyFilters.status]);
+    }, [tab, historyFilters.barberId, historyFilters.status, fetchHistory]);
 
     useEffect(() => {
         fetchData();
-    }, [date]);
+    }, [date, fetchData]);
 
     const updateStatus = async (id: number, status: string) => {
         await fetch(`/api/appointments/${id}`, {
@@ -637,13 +637,8 @@ export default function AdminPage() {
                             <div className={styles.avatarEditContainer}>
                                 <div 
                                     className={styles.avatarPreview} 
-                                    style={{ 
-                                        backgroundColor: editBarberColor,
-                                        backgroundImage: editBarberImageUrl ? `url(${editBarberImageUrl})` : 'none',
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center',
-                                        color: '#1a1a1a'
-                                    }}
+                                    data-has-image={editBarberImageUrl ? 'true' : undefined}
+                                    style={{ '--avatar-bg': editBarberColor, '--avatar-image': editBarberImageUrl ? `url(${editBarberImageUrl})` : 'none' } as React.CSSProperties}
                                 >
                                     {!editBarberImageUrl && editBarberName ? editBarberName[0] : ''}
                                 </div>
@@ -659,7 +654,7 @@ export default function AdminPage() {
                                     id="avatarUploadInput"
                                     type="file"
                                     accept="image/*"
-                                    style={{ display: 'none' }}
+                                    className={styles.hiddenInput}
                                     title="Avatar Upload Input"
                                     placeholder="Avatar Upload Input"
                                     onChange={handleAvatarUpload}
@@ -675,19 +670,25 @@ export default function AdminPage() {
                                 )}
                             </div>
 
-                            <label>Name</label>
+                            <label htmlFor="editBarberName">Name</label>
                             <input
+                                id="editBarberName"
                                 className={styles.input}
                                 value={editBarberName}
                                 onChange={e => setEditBarberName(e.target.value)}
+                                title="Barber Name"
+                                placeholder="Enter barber name"
                             />
 
-                            <label>Color</label>
+                            <label htmlFor="editBarberColor">Color</label>
                             <input
+                                id="editBarberColor"
                                 type="color"
                                 className={styles.colorParams}
                                 value={editBarberColor}
                                 onChange={e => setEditBarberColor(e.target.value)}
+                                title="Barber Color"
+                                placeholder="Select color"
                             />
                         </div>
 
@@ -715,7 +716,7 @@ export default function AdminPage() {
                             <div className={styles.grid}>
                                 {barbers.map(barber => (
                                     <div key={barber.id} className={styles.col}>
-                                        <div className={styles.colHeader} style={{ '--border-top-color': barber.color } as React.CSSProperties} /* NOSONAR */>
+                                        <div className={styles.colHeader} style={{ '--border-top-color': barber.color } as React.CSSProperties}>
                                             {barber.name}
                                         </div>
                                         <div className={styles.colContent}>
@@ -761,23 +762,11 @@ export default function AdminPage() {
                                                         const height = app.service.duration * (100 / 60);
 
                                                         const isRejected = app.status === 'REJECTED';
-                                                        const style: React.CSSProperties = {
-                                                            top: `${top}px`,
-                                                            height: `${height}px`,
-                                                            ...(isRejected ? {
-                                                                width: '30%',
-                                                                left: 'auto',
-                                                                right: 0,
-                                                                opacity: 0.7,
-                                                                zIndex: 5
-                                                            } : {})
-                                                        };
-
                                                         return (
                                                             <div
                                                                 key={app.id}
-                                                                className={`${styles.appointment} ${styles[app.status.toLowerCase()]}`}
-                                                                style={style} /* NOSONAR */
+                                                                className={`${styles.appointment} ${styles[app.status.toLowerCase()]} ${isRejected ? styles.rejectedSmall : ''}`}
+                                                                style={{ '--app-top': `${top}px`, '--app-height': `${height}px` } as React.CSSProperties}
                                                                 onClick={(e) => { e.stopPropagation(); setSelectedAppointment(app); }}
                                                                 title="Click to view details"
                                                             >
@@ -843,12 +832,12 @@ export default function AdminPage() {
                                             {barber.imageUrl ? (
                                                 <span 
                                                     className={styles.avatarDot} 
-                                                    style={{ backgroundImage: `url(${barber.imageUrl})` }}
+                                                    style={{ '--avatar-image': `url(${barber.imageUrl})` } as React.CSSProperties}
                                                 ></span>
                                             ) : (
                                                 <span 
                                                     className={styles.colorDot} 
-                                                    style={{ '--bg-color': barber.color } as React.CSSProperties} /* NOSONAR */
+                                                    style={{ '--bg-color': barber.color } as React.CSSProperties}
                                                 ></span>
                                             )}
                                             {barber.name}
@@ -1002,7 +991,7 @@ export default function AdminPage() {
                                         <div key={img.id} className={styles.imageCard}>
                                             <div
                                                 className={styles.imagePreview}
-                                                style={{ '--bg-image': `url(${img.url})` } as React.CSSProperties} /* NOSONAR */
+                                                style={{ '--bg-image': `url(${img.url})` } as React.CSSProperties}
                                             />
                                             <div className={styles.imageInfo}>
                                                 <input
