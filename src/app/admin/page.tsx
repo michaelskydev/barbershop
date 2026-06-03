@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './page.module.css';
 import { formatTime12h, formatValueTo12h } from '@/lib/utils';
 
@@ -16,6 +16,7 @@ type Appointment = {
     customerPhone?: string;
     service: Service;
     barberId: number;
+    barber: Barber;
 };
 type AboutImage = { id: number; url: string; title: string; subtitle: string; order: number; };
 
@@ -36,6 +37,51 @@ export default function AdminPage() {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [isRescheduling, setIsRescheduling] = useState(false);
     const [rescheduleData, setRescheduleData] = useState({ date: '', time: '', barberId: '' });
+    
+    // Notifications State
+    const [pendingAppointments, setPendingAppointments] = useState<Appointment[]>([]);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    
+    // Upcoming Reminder State
+    const notifiedAppointments = useRef(new Set<number>());
+    const [upcomingReminder, setUpcomingReminder] = useState<Appointment | null>(null);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            const now = new Date();
+            appointments.forEach(app => {
+                if (app.status === 'APPROVED' && !notifiedAppointments.current.has(app.id)) {
+                    const start = new Date(app.startDate);
+                    const diffMs = start.getTime() - now.getTime();
+                    const diffMins = diffMs / 60000;
+                    
+                    if (diffMins > 0 && diffMins <= 5) {
+                        setUpcomingReminder(app);
+                        notifiedAppointments.current.add(app.id);
+                    }
+                }
+            });
+        }, 30000); // Check every 30s
+        return () => clearInterval(intervalId);
+    }, [appointments]);
+
+    const fetchPendingAppointments = useCallback(async () => {
+        try {
+            const res = await fetch('/api/appointments?status=PENDING', { cache: 'no-store' });
+            if (res.ok) {
+                const data = await res.json();
+                setPendingAppointments(data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch pending appointments', err);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchPendingAppointments();
+        const interval = setInterval(fetchPendingAppointments, 30000); // poll every 30s
+        return () => clearInterval(interval);
+    }, [fetchPendingAppointments]);
     
     // Admin Password Change States
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -118,6 +164,7 @@ export default function AdminPage() {
             body: JSON.stringify({ status })
         });
         fetchData();
+        fetchPendingAppointments();
         if (tab === 'history') fetchHistory();
     };
 
@@ -450,6 +497,44 @@ export default function AdminPage() {
                 <div className={styles.headerTop}>
                     <h1>Admin Dashboard</h1>
                     <div className={styles.headerButtons}>
+                        <div className={styles.notificationWrapper}>
+                            <button 
+                                className={styles.bellBtn} 
+                                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                                title="Notifications"
+                            >
+                                🔔
+                                {pendingAppointments.length > 0 && (
+                                    <span className={styles.badge}>{pendingAppointments.length}</span>
+                                )}
+                            </button>
+                            {isNotificationsOpen && (
+                                <div className={styles.notificationDropdown}>
+                                    <h3>Pending Bookings</h3>
+                                    {pendingAppointments.length === 0 ? (
+                                        <p className={styles.noNotifications}>No pending bookings.</p>
+                                    ) : (
+                                        <div className={styles.notificationList}>
+                                            {pendingAppointments.map(app => (
+                                                <div key={app.id} className={styles.notificationItem}>
+                                                    <div className={styles.notifInfo}>
+                                                        <strong>{app.customerName}</strong>
+                                                        <span>{app.service?.name} with {app.barber?.name}</span>
+                                                        <span className={styles.notifDate}>
+                                                            {new Date(app.startDate).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                                                        </span>
+                                                    </div>
+                                                    <div className={styles.notifActions}>
+                                                        <button onClick={(e) => { e.stopPropagation(); updateStatus(app.id, 'APPROVED'); }} className={styles.approveAction} title="Approve">✓</button>
+                                                        <button onClick={(e) => { e.stopPropagation(); updateStatus(app.id, 'REJECTED'); }} className={styles.rejectAction} title="Reject">✕</button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                         <button onClick={() => setPasswordModalOpen(true)} className={styles.passwordBtn}>Change Password</button>
                         <button onClick={handleLogout} className={styles.logoutBtn}>Sign Out</button>
                     </div>
@@ -593,6 +678,32 @@ export default function AdminPage() {
                         <div className={styles.modalActions}>
                             <button onClick={saveSchedule} className={styles.button}>Save Changes</button>
                             <button onClick={() => setEditingSchedule(null)} className={styles.smallBtn}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {upcomingReminder && (
+                <div className={styles.modalOverlay} style={{ zIndex: 1000 }}>
+                    <div className={`${styles.modal} ${styles.styledModal}`}>
+                        <div className={`${styles.modalHeader} ${styles.headerPending}`}>
+                            <h2>🔔 Upcoming Appointment!</h2>
+                        </div>
+                        <div className={styles.modalBody}>
+                            <p style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>
+                                <strong>{upcomingReminder.barber?.name}</strong> has an appointment in less than 5 minutes!
+                            </p>
+                            <div className={styles.infoRow}>
+                                <span className={styles.label}>Customer</span>
+                                <span className={styles.value}>{upcomingReminder.customerName}</span>
+                            </div>
+                            <div className={styles.infoRow}>
+                                <span className={styles.label}>Service</span>
+                                <span className={styles.value}>{upcomingReminder.service?.name}</span>
+                            </div>
+                        </div>
+                        <div className={styles.modalFooter}>
+                            <button onClick={() => setUpcomingReminder(null)} className={styles.button} style={{ width: '100%' }}>Acknowledge</button>
                         </div>
                     </div>
                 </div>
