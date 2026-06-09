@@ -13,6 +13,8 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.108.0",
     "dotenv": "^17.2.3",
     "ics": "^3.8.1",
     "next": "16.1.6",
